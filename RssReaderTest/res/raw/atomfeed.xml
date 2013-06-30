@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<feed xmlns="http://www.w3.org/2005/Atom">
+		<link href="http://martinfowler.com/feed.atom" rel="self"/>
+		<link href="http://martinfowler.com"/>
+		<id>http://martinfowler.com/feed.atom</id>
+		<title>Martin Fowler</title>
+		<subtitle>
+			Master feed of news and updates from martinfowler.com
+		</subtitle>
+		<author>
+			<name>Martin Fowler</name>
+			<email>fowler@acm.org</email>
+			<uri>http://martinfowler.com</uri>
+		</author>
+		<updated>2013-06-14T10:55:00-04:00</updated>
+		<entry>
+			<title>photostream 48</title>
+			<link href="http://martinfowler.com/photos/48.html"/>
+			<updated>2013-06-14T10:55:00-04:00</updated>
+			<id>tag:martinfowler.com,2013-06-14:photostream-48</id>
+			<category term=""/>
+			<content type="html">
+			<p><a href = 'http://martinfowler.com/photos/48.html'><img src = 'http://martinfowler.com/photos/48.jpg'></img></a></p> <p></p> <p>Melrose, MA</p>
+			</content>
+		</entry>
+	</feed>

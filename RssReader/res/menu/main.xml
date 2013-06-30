@@ -1,0 +1,30 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+	<item 
+	    android:id="@+id/action_star"
+	    android:title="@string/app_name"
+	    android:icon="@drawable/ic_action_star"
+	    android:showAsAction="always"/>
+	<item 
+	    android:id="@+id/action_labels"
+	    android:icon="@drawable/ic_action_labels"
+	    android:showAsAction="always"
+	    android:title=""/>
+	<item 
+	    android:id="@+id/action_new"
+	    android:icon="@drawable/ic_action_new"
+	    android:showAsAction="always"
+	    android:title=""/>
+	<item 
+	    android:id="@+id/action_overflow"
+	    android:icon="@drawable/ic_action_overflow"
+	    android:showAsAction="always"
+	    android:title="">
+	    <menu>
+	        <item android:title="@string/menu_about"/>
+	        <item android:title="@string/menu_subcribe"/>
+	        <item android:title="@string/menu_theme"/>
+	        <item android:title="@string/menu_language"/>
+	    </menu>
+	</item>
+</menu>
