@@ -1,17 +1,20 @@
-package com.example.rssreader.core;
+package github.com.qunxi.rssreader.model;
 
-public class SubscribeItem {
+public class Category {
 	private String title;
 	private String updateTime;
 	private long counts;
-	private String addrPic;
+	private String logo;
 	
-	public SubscribeItem(String title, String updateTime, long counts, String addrPic)
+	public Category(){	
+	}
+	
+	public Category(String title, String updateTime, long counts, String addrPic)
 	{
 		this.title = title;
 		this.updateTime = updateTime;
 		this.counts = counts;
-		this.addrPic = addrPic;
+		this.logo = addrPic;
 	}
 
 	public String getTitle() {
@@ -39,10 +42,10 @@ public class SubscribeItem {
 	}
 
 	public String getAddrPic() {
-		return addrPic;
+		return logo;
 	}
 
 	public void setAddrPic(String addrPic) {
-		this.addrPic = addrPic;
+		this.logo = addrPic;
 	}
 }

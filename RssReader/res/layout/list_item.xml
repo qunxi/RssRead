@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+    <ImageView android:id="@+id/list_item_icon"
+	        android:contentDescription="@string/app_name"
+	        android:layout_width="35dip"
+	        android:layout_height="35dip"
+	        android:layout_centerVertical="true"
+        	android:layout_alignParentLeft="true"/>
+	       <!--  android:src="@drawable/ic_action_rss"/>-->
+    <LinearLayout android:orientation="vertical"  
+    	android:layout_width="wrap_content"  
+   	 	android:layout_height="fill_parent"
+   	 	android:paddingTop="2dip"
+   	 	android:paddingRight="10dip"
+   	 	android:paddingLeft="10dip"
+   	 	android:layout_toRightOf="@id/list_item_icon">
+		<TextView android:id="@+id/list_item_title"
+		    android:textIsSelectable="false"
+		    android:textStyle="bold"
+		    android:textSize="18sp"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:paddingBottom="2dip"/>
+		<TextView android:id="@+id/list_item_updated"
+		    android:textIsSelectable="false"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:textColor="#BEBEBE"
+		    android:paddingBottom="5dip"/>
+	</LinearLayout>
+	<TextView android:id="@+id/list_item_count"
+	    android:textIsSelectable="false"
+	    android:layout_alignParentRight="true"
+	    android:layout_centerVertical="true"
+	    android:layout_margin="5dip"
+	    android:textStyle="bold"
+	    android:textColor="#778899"
+	    android:background="@drawable/radius_conrer"
+	    android:layout_width="45dip"
+	    android:gravity="center_horizontal"
+	    android:layout_height="wrap_content"/>
+</RelativeLayout>

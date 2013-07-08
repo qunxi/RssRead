@@ -3,25 +3,27 @@
  */
 package com.example.rssreader.test;
 
+import github.com.qunxi.rssreader.model.Category;
+import github.com.qunxi.rssreader.model.Entry;
+import github.com.qunxi.rssreader.model.Feed;
+import github.com.qunxi.rssreader.xmlparser.FeedBuilderFactory;
+import github.com.qunxi.rssreader.xmlparser.IFeedBuilder;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-import com.example.rssreader.core.AtomEntryBuilder;
-import com.example.rssreader.core.Entry;
-
-//import android.test.InstrumentationTestCase;
+import android.test.InstrumentationTestCase;
 import android.util.Xml;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 
-public class AtomEntryBuilderTest extends TestCase {
+public class AtomEntryBuilderTest extends InstrumentationTestCase {
 
 	private StringBuilder xml = new StringBuilder();
 
@@ -54,19 +56,23 @@ public class AtomEntryBuilderTest extends TestCase {
 
 	public void testGetEntries() {
 		InputStream stream = new ByteArrayInputStream(xml.toString().getBytes());
-		//InputStream stream = getInstrumentation().getContext().getResources().openRawResource(R.raw.atomfeed);
-
+		
 		XmlPullParser parser = Xml.newPullParser();
 		try {
 			parser.setInput(stream,  null);
 			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(stream, null);
             parser.nextTag();
-            AtomEntryBuilder builder = new AtomEntryBuilder();
-            List<Entry> entries = builder.getEntries(parser);
-            Assert.assertEquals(true, true);
-            //List<Entry> 
-            //Assert.assertEquals(expected, entries);
+            IFeedBuilder builder = FeedBuilderFactory.instance().createFeedBuilder(parser);
+            Category category = new Category("Martin Fowler", "2013-06-14T10:55:00-04:00", -1, null);
+            Entry entry = new Entry("photostream 48", "http://martinfowler.com/photos/48.html", null, 
+            			"<p><a href = 'http://martinfowler.com/photos/48.html'><img src = 'http://martinfowler.com/photos/48.jpg'></img></a></p> <p></p> <p>Melrose, MA</p>");
+	        List<Entry> entries = new ArrayList<Entry>();
+	        entries.add(entry);
+            Feed expectFeed = new Feed(category, entries);
+            Feed actualFeed = builder.getFeed(parser);
+            assertEquals(expectFeed, actualFeed);
+            
 		} catch (XmlPullParserException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
