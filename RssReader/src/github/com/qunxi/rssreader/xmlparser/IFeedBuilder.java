@@ -3,8 +3,6 @@ package github.com.qunxi.rssreader.xmlparser;
 import github.com.qunxi.rssreader.model.Feed;
 
 import java.io.IOException;
-
-import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 
@@ -29,7 +27,7 @@ public interface IFeedBuilder
 	public static final String LinkTag = "link";
 	public static final String HrefAttribute = "href";
 	
-	public abstract Feed getFeed(XmlPullParser parser) 
+	public abstract Feed getFeed() 
 					throws XmlPullParserException, IOException;
 		
 }

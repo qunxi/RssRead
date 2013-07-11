@@ -1,0 +1,41 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    		
+    	<TextView android:id="@+id/artical_title"
+    	    android:layout_width="match_parent"
+    	    android:layout_height="60dip"
+    	    android:textIsSelectable="false"
+    	    android:textStyle="bold"
+    	    android:textSize="20sp"
+    	    android:padding="5dip"
+    	    android:gravity="bottom"/>
+    	
+		<View android:layout_height="1dp"
+		       android:background="#BEBEBE"       
+        	   android:layout_width="fill_parent"
+        	   android:padding="5dip"/>
+		
+		<RelativeLayout android:layout_width="fill_parent"
+		    	android:layout_height="wrap_content"
+		    	android:padding="5dip">
+		    	
+		    <TextView android:id="@+id/categoryTitle"
+		         android:textIsSelectable="false"
+		         android:layout_width="wrap_content"
+		         android:layout_height="wrap_content"
+		         android:layout_alignParentLeft="true"
+		         android:textColor="#0000BB"/>
+		    
+		    <TextView android:id="@+id/artical_updated"
+		         android:textIsSelectable="false"
+		         android:layout_width="wrap_content"
+		         android:layout_height="wrap_content"
+		         android:layout_alignParentRight="true"/>
+		</RelativeLayout>
+		
+		<WebView android:id="@+id/webview"
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"/>
+</LinearLayout>

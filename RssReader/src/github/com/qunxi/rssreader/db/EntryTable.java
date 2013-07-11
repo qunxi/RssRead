@@ -8,4 +8,5 @@ public class EntryTable {
 	public static final String LINK = "link";
 	public static final String DESCRIPTION = "description";
 	public static final String CONTENT = "content";
+	public static final String UPDATED = "updated";
 }

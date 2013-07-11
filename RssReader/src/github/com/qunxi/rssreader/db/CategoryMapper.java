@@ -18,7 +18,9 @@ public class CategoryMapper {
 	
 	public CategoryMapper(Context context){
 		dbHelper = DatabaseHelper.instance(context);
+		
 		wdb = dbHelper.getWritableDatabase();
+		//dbHelper.onUpgrade(wdb, 1, 2);
 		rdb = dbHelper.getReadableDatabase();
 	}
 	
@@ -65,6 +67,9 @@ public class CategoryMapper {
 			
 			int colid = c.getColumnIndex(CategoryTable.COUNT);
 			category.setCounts(c.getLong(colid));
+			
+			colid = c.getColumnIndex(CategoryTable.ID);
+			category.setId(c.getLong(colid));
 			
 			colid = c.getColumnIndex(CategoryTable.TITLE);
 			category.setTitle(c.getString(colid));

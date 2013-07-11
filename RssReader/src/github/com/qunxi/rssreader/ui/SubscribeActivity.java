@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import com.example.rssreader.R;
@@ -20,7 +19,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
-import android.util.Xml;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
@@ -103,12 +101,8 @@ public class SubscribeActivity extends Activity {
 		private Feed getFeedFromXml(InputStream stream) throws IOException
 		{
 			try {
-				XmlPullParser parser = Xml.newPullParser();
-				parser.setInput(stream,  null);
-				parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-		        parser.nextTag();
-		        IFeedBuilder builder = FeedBuilderFactory.instance().createFeedBuilder(parser);
-		        return builder.getFeed(parser);
+		        IFeedBuilder builder = FeedBuilderFactory.instance().createFeedBuilder(stream);
+		        return builder.getFeed();
 			}catch (XmlPullParserException e) {
 				Log.d("getFeedFromXml", "getFeed has exception");
 				e.printStackTrace();

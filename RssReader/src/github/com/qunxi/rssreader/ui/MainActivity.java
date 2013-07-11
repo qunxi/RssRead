@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class MainActivity extends ListActivity {
@@ -27,19 +28,22 @@ public class MainActivity extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//setContentView(R.layout.activity_main);
-		/*List<Category> categories = new ArrayList<Category>();
-		Category cate1 = new Category("wangqunxi1","updated 2013-1-2", 10, null);
-		Category cate2 = new Category("wangqunxi2","updated 2013-1-3", 10, null);
-		Category cate3 = new Category("wangqunxi3","updated 2013-1-4", 10, null);
-		categories.add(cate1);
-		categories.add(cate2);
-		categories.add(cate3);*/
 		List<Category> categories = getCategories(0);
 		FeedsAdapter feedAdapter = new FeedsAdapter(this, categories);
 		setListAdapter(feedAdapter);
 	}
 
+	@Override
+	protected void onListItemClick (ListView l, View v, int position, long id)
+	{
+		Category selectItem = (Category)getListAdapter().getItem(position);
+		long categoryId = selectItem.getId();
+		Intent intent = new Intent(this, EntriesActivity.class);
+		intent.putExtra("categoryId", categoryId);
+		intent.putExtra("categoryTitle", selectItem.getTitle());
+		startActivity(intent);
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -68,9 +72,10 @@ public class MainActivity extends ListActivity {
 		private final Activity context;
 		private final List<Category> categories;
 		private ViewContainer container = new ViewContainer();
+		
 		public FeedsAdapter(Activity context, List<Category> objects) 
 		{
-			super(context, R.layout.list_item, objects);
+			super(context, R.layout.category_item, objects);
 			this.context = context;
 			this.categories = objects;
 		}
@@ -81,12 +86,12 @@ public class MainActivity extends ListActivity {
 			
 			if(convertView == null){
 				LayoutInflater inflater = context.getLayoutInflater();
-				view = inflater.inflate(R.layout.list_item, null);
+				view = inflater.inflate(R.layout.category_item, null);
 				
-				container.iconImage = (ImageView)view.findViewById(R.id.list_item_icon);
-				container.titleText = (TextView)view.findViewById(R.id.list_item_title);
-				container.updatedText = (TextView)view.findViewById(R.id.list_item_updated);
-				container.countText = (TextView)view.findViewById(R.id.list_item_count);
+				container.iconImage = (ImageView)view.findViewById(R.id.category_item_icon);
+				container.titleText = (TextView)view.findViewById(R.id.category_item_title);
+				container.updatedText = (TextView)view.findViewById(R.id.category_item_updated);
+				container.countText = (TextView)view.findViewById(R.id.category_item_count);
 				view.setTag(container);
 			}
 			else{
@@ -98,10 +103,11 @@ public class MainActivity extends ListActivity {
 			container.titleText.setText(categories.get(position).getTitle());
 			container.updatedText.setText(categories.get(position).getUpdateTime());
 			container.countText.setText(Long.toString(categories.get(position).getCounts()));
+			
 			return view;
 		}
 		
-		final class ViewContainer{
+		private final class ViewContainer{
 			protected ImageView iconImage;
 			protected TextView titleText;
 			protected TextView updatedText;

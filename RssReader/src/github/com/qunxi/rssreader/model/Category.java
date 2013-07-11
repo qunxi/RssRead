@@ -5,6 +5,7 @@ public class Category {
 	private String updateTime;
 	private long counts;
 	private String logo;
+	private long id;
 	
 	public Category(){	
 	}
@@ -47,5 +48,13 @@ public class Category {
 
 	public void setAddrPic(String addrPic) {
 		this.logo = addrPic;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 }

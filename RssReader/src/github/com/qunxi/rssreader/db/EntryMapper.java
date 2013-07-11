@@ -27,12 +27,17 @@ public class EntryMapper
 	//	return null;
 	//}
 	
-	public List<Entry> loadEntries(int offset)
+	public List<Entry> loadEntries(int offset, long categoryId)
 	{
 		List<Entry> entries = new ArrayList<Entry>();
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * FROM ")
 		   .append(EntryTable.TABLE_NAME)
+		   .append(" WHERE ")
+		   .append(EntryTable.CATEGORY_ID)
+		   .append(" == ")
+		   .append(categoryId)
+		   .append(" order by updated desc ")
 		   .append(" LIMIT ")
 		   .append(LIMIT)
 		   .append(" OFFSET ")
@@ -46,7 +51,7 @@ public class EntryMapper
 			entry.setLink(c.getString(colid));
 			
 			colid = c.getColumnIndex(EntryTable.TITLE);
-			entry.setDescription(c.getString(colid));
+			entry.setTitle(c.getString(colid));
 			
 			colid = c.getColumnIndex(EntryTable.DESCRIPTION);
 			entry.setDescription(c.getString(colid));
@@ -54,6 +59,8 @@ public class EntryMapper
 			colid = c.getColumnIndex(EntryTable.CONTENT);
 			entry.setContent(c.getString(colid));
 
+			colid = c.getColumnIndex(EntryTable.UPDATED);
+			entry.setUpdated(c.getString(colid));
 			entries.add(entry);
 	     }
 	     
@@ -70,6 +77,7 @@ public class EntryMapper
 		values.put(EntryTable.LINK, entry.getLink());
 		values.put(EntryTable.DESCRIPTION, entry.getDescription());
 		values.put(EntryTable.CONTENT, entry.getContent());
+		values.put(EntryTable.UPDATED, entry.getUpdated());
 		return wdb.insert(EntryTable.TABLE_NAME, EntryTable.ID, values);
 	}
 	

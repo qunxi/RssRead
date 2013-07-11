@@ -13,13 +13,14 @@ import org.xmlpull.v1.XmlPullParserException;
 
 public class AtomFeedBuilder implements IFeedBuilder
 {
+	private XmlPullParser parser;
 	
-	
-	public AtomFeedBuilder(){
+	public AtomFeedBuilder(XmlPullParser parser){
+		this.parser = parser;
 	}
 	
 
-	public Feed getFeed(XmlPullParser parser) throws XmlPullParserException, IOException
+	public Feed getFeed() throws XmlPullParserException, IOException
 	{
 		parser.require(XmlPullParser.START_TAG, NameSpace, FeedTag);
 		List<Entry> entries = new ArrayList<Entry>();
@@ -32,69 +33,73 @@ public class AtomFeedBuilder implements IFeedBuilder
 			}
 			String name = parser.getName();
 			if(name.equals(EntryTag)){	// get all entries of feed
-				entries.add(generateEntry(parser));
+				entries.add(generateEntry());
 			}
 			else if(name.equals(TitleTag)){ //feed title
-				headerTitle = getTitle(parser);
+				headerTitle = getTitle();
 			}
 			else if(name.equals(UpdatedTag)){ //feed update date
-				feedUpdated = getUpdated(parser);
+				feedUpdated = getUpdated();
 			}
 			else{
-				ignoreNotInterestTag(parser);
+				ignoreNotInterestTag();
 			}
 		}
 		Category feedHeader = new Category(headerTitle, feedUpdated, entries.size(), logo);
 		return new Feed(feedHeader, entries);
 	}
 	
-	private Entry generateEntry(XmlPullParser parser) throws XmlPullParserException, IOException
+	private Entry generateEntry() throws XmlPullParserException, IOException
 	{
 		String title = null;
 		String link = null;
 		String description = null;
 		String content = null;
+		String updated = null;
 		while(parser.next() != XmlPullParser.END_TAG){
 			if(parser.getEventType() != XmlPullParser.START_TAG){
 				continue;
 			}
 			String name = parser.getName();
 			if(name.equals(TitleTag)){
-				title = getTitle(parser);
+				title = getTitle();
 			}
 			else if(name.equals(LinkTag)){
-				link = getLink(parser);
+				link = getLink();
 			}
 			else if(name.equals(SummaryTag)){
-				description = getDescription(parser);
+				description = getDescription();
 			}
 			else if(name.equals(ContentTag)){
-				content = getContents(parser);
+				content = getContents();
+			}
+			else if(name.equals(UpdatedTag)){
+				updated = getUpdated();
 			}
 			else{
-				ignoreNotInterestTag(parser);
+				ignoreNotInterestTag();
 			}
 		}
-		return new Entry(title, link, description, content);
+		return new Entry(title, link, description, content, updated);
 	}
 
-	private String getUpdated(XmlPullParser parser) throws XmlPullParserException, IOException{
-		return readText(parser, UpdatedTag);
+	private String getUpdated() throws XmlPullParserException, IOException{
+		return readText(UpdatedTag);
 	}
 	
-	private String getTitle(XmlPullParser parser) throws XmlPullParserException, IOException {
-		return readText(parser, TitleTag);
+	private String getTitle() throws XmlPullParserException, IOException {
+		return readText(TitleTag);
 	}
 
-	private String getDescription(XmlPullParser parser) throws XmlPullParserException, IOException {
-		return readText(parser, SummaryTag);
+	private String getDescription() throws XmlPullParserException, IOException {
+		return readText(SummaryTag);
 	}
 
-	private String getContents(XmlPullParser parser) throws XmlPullParserException, IOException {
-		return readText(parser, ContentTag);
+	private String getContents() throws XmlPullParserException, IOException {
+		return readText(ContentTag);
 	}
 	
-	private String getLink(XmlPullParser parser) throws XmlPullParserException, IOException 
+	private String getLink() throws XmlPullParserException, IOException 
 	{
 		String link = null;
 		parser.require(XmlPullParser.START_TAG, NameSpace, LinkTag);
@@ -111,15 +116,15 @@ public class AtomFeedBuilder implements IFeedBuilder
 		return link;
 	}
 	
-	private String readText(XmlPullParser parser, String tagName) throws XmlPullParserException, IOException
+	private String readText(String tagName) throws XmlPullParserException, IOException
 	{
 		parser.require(XmlPullParser.START_TAG, NameSpace, tagName);
-		String text = getInnerAllValuesOfTag(parser, tagName);
+		String text = getInnerAllValuesOfTag(tagName);
 		parser.require(XmlPullParser.END_TAG, NameSpace, tagName);
 		return text;
 	}
 
-	private String getInnerAllValuesOfTag(XmlPullParser parser, String tagName) 
+	private String getInnerAllValuesOfTag(String tagName) 
 									throws XmlPullParserException, IOException
 	{
 		StringBuilder strBuilder = new StringBuilder();
@@ -152,7 +157,7 @@ public class AtomFeedBuilder implements IFeedBuilder
 		return strBuilder.toString();
 	}
 	
-	private void ignoreNotInterestTag(XmlPullParser parser)
+	private void ignoreNotInterestTag()
 							   throws XmlPullParserException, IOException
 	{
 		if (parser.getEventType() != XmlPullParser.START_TAG) {

@@ -15,11 +15,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.test.InstrumentationTestCase;
-import android.util.Xml;
 
 
 
@@ -57,21 +55,17 @@ public class AtomEntryBuilderTest extends InstrumentationTestCase {
 	public void testGetEntries() {
 		InputStream stream = new ByteArrayInputStream(xml.toString().getBytes());
 		
-		XmlPullParser parser = Xml.newPullParser();
 		try {
-			parser.setInput(stream,  null);
-			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-            parser.setInput(stream, null);
-            parser.nextTag();
-            IFeedBuilder builder = FeedBuilderFactory.instance().createFeedBuilder(parser);
+			IFeedBuilder builder = FeedBuilderFactory.instance().createFeedBuilder(stream);
             Category category = new Category("Martin Fowler", "2013-06-14T10:55:00-04:00", -1, null);
             Entry entry = new Entry("photostream 48", "http://martinfowler.com/photos/48.html", null, 
-            			"<p><a href = 'http://martinfowler.com/photos/48.html'><img src = 'http://martinfowler.com/photos/48.jpg'></img></a></p> <p></p> <p>Melrose, MA</p>");
+            			"<p><a href = 'http://martinfowler.com/photos/48.html'><img src = 'http://martinfowler.com/photos/48.jpg'></img></a></p> <p></p> <p>Melrose, MA</p>",
+            			"2013-06-14T10:55:00-04:00");
 	        List<Entry> entries = new ArrayList<Entry>();
 	        entries.add(entry);
             Feed expectFeed = new Feed(category, entries);
-            Feed actualFeed = builder.getFeed(parser);
-            assertEquals(expectFeed, actualFeed);
+            Feed actualFeed = builder.getFeed();
+            assertTrue(FeedCompare(expectFeed, actualFeed));
             
 		} catch (XmlPullParserException e) {
 			// TODO Auto-generated catch block
@@ -87,6 +81,24 @@ public class AtomEntryBuilderTest extends InstrumentationTestCase {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	private boolean FeedCompare(Feed expectFeed, Feed actualFeed){
+		if( expectFeed.getCategory().getTitle() == actualFeed.getCategory().getTitle()
+			&& expectFeed.getCategory().getUpdateTime() == actualFeed.getCategory().getUpdateTime()){
+			List<Entry> eEntries = expectFeed.getEntries();
+			List<Entry> aEntries = actualFeed.getEntries();
+			for(int i = 0; i < expectFeed.getEntries().size(); ++i){
+				if(!(eEntries.get(i).getContent() == aEntries.get(i).getContent()
+				   && eEntries.get(i).getUpdated() == aEntries.get(i).getUpdated()
+				   && eEntries.get(i).getSummary() == aEntries.get(i).getSummary()
+				   && eEntries.get(i).getTitle() == aEntries.get(i).getTitle())){
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 
 }
