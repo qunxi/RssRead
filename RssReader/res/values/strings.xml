@@ -9,8 +9,8 @@
     <string name="menu_language">language</string>
     <string name="subscribe_search">Search</string>
     <string name="subscribe_search_hint">Enter Keywords or website</string>
-    <string name="title_activity_entries">EntriesActivity</string>
+    <string name="title_activity_entries">Entries</string>
     <string name="hello_world">Hello world!</string>
-    <string name="title_activity_details">DetailsActivity</string>
+    <string name="title_activity_details">Details</string>
 
 </resources>

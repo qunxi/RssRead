@@ -22,23 +22,34 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class EntriesActivity extends ListActivity {
+public class EntriesActivity extends ListActivity implements OnScrollListener {
 
-	private String categoryTitle = null;
+	private static final int LOAD_ITEMS = 10;
+	
+	private String categoryTitle;
+	private long categoryId;
+	
+	private int currentPoistion = -10; //this number for the start position of select from database.
+	
+	boolean updated = false;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		EntryMapper entryMapper = new EntryMapper(this);
-		long categoryId = getIntent().getLongExtra("categoryId", -1);
-		List<Entry> entries = entryMapper.loadEntries(0, categoryId);
+		
 		categoryTitle = getIntent().getStringExtra("categoryTitle");
-		EntryAdapter entryAdapter = new EntryAdapter(this, entries);
+		this.categoryId = getIntent().getLongExtra("categoryId", -1);
+		
+		EntryAdapter entryAdapter = new EntryAdapter(this, loadEntries(categoryId));
 		setListAdapter(entryAdapter);
+		
+		getListView().setOnScrollListener(this);
 	}
 
 	@Override
@@ -47,7 +58,24 @@ public class EntriesActivity extends ListActivity {
 		getMenuInflater().inflate(R.menu.entries, menu);
 		return true;
 	}
+	
+	@Override  
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		
+		if(scrollState == OnScrollListener.SCROLL_STATE_IDLE && updated){
+			
+			EntryAdapter entryAdapter = (EntryAdapter)getListAdapter();
+			entryAdapter.addAll(loadEntries(categoryId));
+		}
+	}
+	
+	@Override
+	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
+	{
+		if((firstVisibleItem + visibleItemCount) % LOAD_ITEMS == 0){
+			updated = true;
+		}
+	}
 	
 	@Override
 	protected void onListItemClick (ListView l, View v, int position, long id)
@@ -62,17 +90,16 @@ public class EntriesActivity extends ListActivity {
 		startActivity(intent);
 	}
 	
-	//@Override
-	
+	private List<Entry> loadEntries(long categoryId){
+		EntryMapper entryMapper = new EntryMapper(this);
+		return entryMapper.loadEntries(currentPoistion += LOAD_ITEMS, categoryId);
+	}
 	
 	private class EntryAdapter extends ArrayAdapter<Entry>{
 
 		private final List<Entry> entries;
 		private final Activity context;
-		private ViewContainer container = new ViewContainer();
-		//private static final int SUMMARY_BEGIN = 0;
-		//private static final int SUMMARY_END = 150;
-		
+				
 		public EntryAdapter(Activity context, List<Entry> entries) 
 		{
 			super(context, R.layout.entry_item, entries);
@@ -83,11 +110,13 @@ public class EntriesActivity extends ListActivity {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent){
 			View view = null;
-			convertView = null;
+			ViewHolder container = null;
 			if(convertView == null){
+				
 				LayoutInflater inflater = context.getLayoutInflater();
 				view = inflater.inflate(R.layout.entry_item, null);
 				
+				container = new ViewHolder();
 				container.summaryText = (TextView)view.findViewById(R.id.entry_item_summary);
 				container.updatedText = (TextView)view.findViewById(R.id.entry_item_updated);
 				container.iconImage = (ImageView)view.findViewById(R.id.entry_item_icon);
@@ -96,7 +125,7 @@ public class EntriesActivity extends ListActivity {
 			}
 			else{
 				view = convertView;
-				container = (ViewContainer)view.getTag();
+				container = (ViewHolder)view.getTag();
 			}
 			
 			Bitmap bitmap = null;
@@ -123,22 +152,8 @@ public class EntriesActivity extends ListActivity {
 			return view;
 		}
 		
-		/*private String getSummary(int position)
-		{
-			String description = entries.get(position).getDescription();
-			if(description == null){
-				
-				String contents = Html.fromHtml(entries.get(position).getContent().replaceAll("<img.+?>", "")).toString();
-				int length = contents.length();
-				int end = length < SUMMARY_END ? length : SUMMARY_END; 
-				String summary = contents.substring(SUMMARY_BEGIN,  end);
-				//return summary.replaceFirst("<img.+?>", "");
-				return summary;
-			}
-			return description;
-		}*/
-		
-		private final class ViewContainer{
+	
+		private final class ViewHolder{
 			protected ImageView iconImage;
 			protected TextView updatedText;
 			protected TextView summaryText;
