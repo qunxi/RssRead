@@ -5,7 +5,8 @@ public class Category {
 	private String updateTime;
 	private long counts;
 	private String logo;
-	private long id;
+	private long id = -1;
+	private String url;
 	
 	public Category(){	
 	}
@@ -57,4 +58,15 @@ public class Category {
 	public void setId(long id) {
 		this.id = id;
 	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	
+	//
+	
 }

@@ -9,17 +9,23 @@ import java.util.List;
 
 import github.com.qunxi.rssreader.db.EntryMapper;
 import github.com.qunxi.rssreader.model.Entry;
+import github.com.qunxi.rssreader.model.Feed;
+import github.com.qunxi.rssreader.net.DownloadXmlAsyncTask;
+
 import com.example.rssreader.R;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -36,7 +42,7 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 	private String categoryTitle;
 	private long categoryId;
 	
-	private int currentPoistion = -10; //this number for the start position of select from database.
+	private int currentPosition = -10; //this number for the start position of select from database.
 	
 	boolean updated = false;
 	@Override
@@ -59,15 +65,52 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 		return true;
 	}
 	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item){
+		if(item.getItemId() == R.id.action_entries_refresh){
+			//Intent intent = new Intent(this, )
+			String url = getIntent().getStringExtra("url");
+			String fromDate = getIntent().getStringExtra("fromDate");
+			new UpdateAnsyncTask(this).execute(url, fromDate);
+			
+		}
+		return true;
+	}
+	
 	@Override  
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		
 		if(scrollState == OnScrollListener.SCROLL_STATE_IDLE && updated){
-			
-			EntryAdapter entryAdapter = (EntryAdapter)getListAdapter();
-			entryAdapter.addAll(loadEntries(categoryId));
+			new ScrollLoadAsnycTask(this).execute();
+			/*EntryAdapter entryAdapter = (EntryAdapter)getListAdapter();
+			entryAdapter.addAll(loadEntries(categoryId));*/
 		}
 	}
+	
+	
+	private class ScrollLoadAsnycTask extends AsyncTask<Void, Void, List<Entry>> {
+
+		private EntriesActivity context;
+		
+		public ScrollLoadAsnycTask(EntriesActivity context) {
+			this.context = context;
+		}
+		
+		@Override
+		protected List<Entry> doInBackground(Void... params) {
+			
+			return context.loadEntries(context.categoryId);
+		}
+		
+		@Override
+	    protected void onPostExecute(List<Entry> result) {
+			EntryAdapter adapter = (EntryAdapter)context.getListAdapter();
+			adapter.addAll(result);
+	    }
+		
+	}
+	
+	
 	
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
@@ -92,12 +135,33 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 	
 	private List<Entry> loadEntries(long categoryId){
 		EntryMapper entryMapper = new EntryMapper(this);
-		return entryMapper.loadEntries(currentPoistion += LOAD_ITEMS, categoryId);
+		return entryMapper.loadAll(categoryId, currentPosition += LOAD_ITEMS);
+		//return entryMapper.loadEntries(currentPoistion += LOAD_ITEMS, categoryId);
+	}
+	
+	
+	private class UpdateAnsyncTask extends DownloadXmlAsyncTask{
+
+		private EntryAdapter adapter;
+		public UpdateAnsyncTask(Context context) {
+			super(context);
+			this.adapter = (EntryAdapter)((EntriesActivity)context).getListAdapter();
+		}
+		
+		@Override
+		protected void onPostExecute(Feed result) {
+			if(result != null){
+				result.getCategory().setId(categoryId);
+				super.onPostExecute(result);
+				List<Entry> entries = loadEntries(((EntriesActivity)context).categoryId);
+				adapter.refresh(entries);
+			}
+	    }
 	}
 	
 	private class EntryAdapter extends ArrayAdapter<Entry>{
 
-		private final List<Entry> entries;
+		private List<Entry> entries;
 		private final Activity context;
 				
 		public EntryAdapter(Activity context, List<Entry> entries) 
@@ -105,6 +169,11 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 			super(context, R.layout.entry_item, entries);
 			this.entries = entries;
 			this.context = context;
+		}
+		
+		public void refresh(List<Entry> entries){
+			this.entries = entries;
+			notifyDataSetChanged();
 		}
 		
 		@Override

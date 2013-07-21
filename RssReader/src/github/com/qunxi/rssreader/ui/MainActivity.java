@@ -39,6 +39,8 @@ public class MainActivity extends ListActivity {
 		Category selectItem = (Category)getListAdapter().getItem(position);
 		long categoryId = selectItem.getId();
 		Intent intent = new Intent(this, EntriesActivity.class);
+		intent.putExtra("url", selectItem.getUrl());
+		intent.putExtra("fromDate", selectItem.getUpdateTime());
 		intent.putExtra("categoryId", categoryId);
 		intent.putExtra("categoryTitle", selectItem.getTitle());
 		startActivity(intent);
@@ -50,6 +52,7 @@ public class MainActivity extends ListActivity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
@@ -63,7 +66,8 @@ public class MainActivity extends ListActivity {
 	private List<Category> getCategories(int curPos)
 	{
 		CategoryMapper categoryMapper = new CategoryMapper(this);
-		return categoryMapper.getCategories(curPos);
+		return categoryMapper.loadAll(-1, curPos);
+		//return categoryMapper.getCategories(curPos);
 	}
 	///
 	

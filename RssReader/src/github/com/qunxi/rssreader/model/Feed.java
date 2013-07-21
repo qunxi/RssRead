@@ -26,4 +26,14 @@ public class Feed {
 	public void setCategory(Category category) {
 		this.category = category;
 	}
+	
+	public void setCategoryId(long id){
+		if(category != null){
+			category.setId(id);
+		}
+		
+		for(Entry entry : entries){
+			entry.setCategoryId(id);
+		}
+	}
 }

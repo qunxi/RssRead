@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.example.rssreader.test;
+package github.com.qunxi.rssreader.test;
 
 import github.com.qunxi.rssreader.model.Category;
 import github.com.qunxi.rssreader.model.Entry;
@@ -26,6 +26,7 @@ public class AtomEntryBuilderTest extends InstrumentationTestCase {
 	private StringBuilder xml = new StringBuilder();
 
 	public AtomEntryBuilderTest() {
+		//String xml = "<?xml version"
 		xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
 		   .append("<feed xmlns=\"http://www.w3.org/2005/Atom\">")
 		   .append("<link href=\"http://martinfowler.com/feed.atom\" rel=\"self\"/>")
@@ -64,7 +65,7 @@ public class AtomEntryBuilderTest extends InstrumentationTestCase {
 	        List<Entry> entries = new ArrayList<Entry>();
 	        entries.add(entry);
             Feed expectFeed = new Feed(category, entries);
-            Feed actualFeed = builder.getFeed();
+            Feed actualFeed = builder.getFeed(null);
             assertTrue(FeedCompare(expectFeed, actualFeed));
             
 		} catch (XmlPullParserException e) {

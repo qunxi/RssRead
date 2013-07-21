@@ -6,5 +6,6 @@ public class CategoryTable {
 	public static final String TITLE = "title";
 	public static final String COUNT = "count";
 	public static final String UPDATE_DATE = "updated";
+	public static final String URL = "url";
 	
 }

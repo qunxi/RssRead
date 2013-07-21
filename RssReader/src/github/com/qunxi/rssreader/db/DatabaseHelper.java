@@ -9,7 +9,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 	private final static String DATABASE_NAME = "rss.db";
 	private final static int DATABASE_VERSION = 1;
 	
-	private final static String CATEGORY_TABLE_SQL= "CREATE TABLE category (id INTEGER PRIMARY KEY, title TEXT, count INTEGER, updated TEXT)";
+	private final static String CATEGORY_TABLE_SQL= "CREATE TABLE category (id INTEGER PRIMARY KEY, title TEXT, count INTEGER, updated TEXT, url TEXT)";
 	private final static String ENTRY_TABLE_SQL = "CREATE TABLE entry (id INTEGER PRIMARY KEY, categoryId INTEGER, title TEXT, link TEXT, description TEXT, content TEXT, updated TEXT)";
 	
 	

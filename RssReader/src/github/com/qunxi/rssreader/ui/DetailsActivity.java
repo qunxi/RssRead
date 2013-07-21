@@ -32,7 +32,7 @@ public class DetailsActivity extends Activity {
 		webSettings.setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
 		
 
-		view.loadData(content, "text/html", null);
+		view.loadDataWithBaseURL (null, content, "text/html", "utf-8",null);
 	}
 
 	@Override

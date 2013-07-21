@@ -35,7 +35,7 @@ public class FeedBuilderFactory
 		}
 		else if(tagName.equals(IFeedBuilder.RssTag)){
 			//String version = parser.getAttributeValue(IFeedBuilder.NameSpace, IFeedBuilder.VersionAttr);
-			return new RssFeedBuilder();
+			return new RssFeedBuilder(parser);
 		}
 		else{
 			return null;

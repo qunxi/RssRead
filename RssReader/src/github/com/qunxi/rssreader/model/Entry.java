@@ -15,7 +15,7 @@ public class Entry {
 	private String description;
 	private String content;
 	private String updated;
-	
+	private long categoryId = -1;
 	public Entry(){
 		
 	}
@@ -88,5 +88,13 @@ public class Entry {
 
 	public void setUpdated(String updated) {
 		this.updated = updated;
+	}
+
+	public long getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(long categoryId) {
+		this.categoryId = categoryId;
 	}
 }

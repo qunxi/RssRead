@@ -6,29 +6,16 @@ import java.util.List;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import github.com.qunxi.rssreader.model.Entry;
 
-public class EntryMapper 
-{
-	private DatabaseHelper dbHelper = null;
-	private SQLiteDatabase wdb = null;
-	private SQLiteDatabase rdb = null;
-	
-	private static final int LIMIT = 10;
-	
-	public EntryMapper(Context context){
-		dbHelper = DatabaseHelper.instance(context);
-		wdb = dbHelper.getWritableDatabase();
-		rdb = dbHelper.getReadableDatabase();
+public class EntryMapper extends AbstractMapper<Entry>{
+
+	public EntryMapper(Context context) {
+		super(context);
 	}
-	
-	//private Entry load(long id){
-	//	return null;
-	//}
-	
-	public List<Entry> loadEntries(int offset, long categoryId)
-	{
+
+	@Override
+	public List<Entry> loadAll(long id, int offset) {
 		List<Entry> entries = new ArrayList<Entry>();
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * FROM ")
@@ -36,7 +23,7 @@ public class EntryMapper
 		   .append(" WHERE ")
 		   .append(EntryTable.CATEGORY_ID)
 		   .append(" == ")
-		   .append(categoryId)
+		   .append(id)
 		   .append(" order by updated desc ")
 		   .append(" LIMIT ")
 		   .append(LIMIT)
@@ -61,6 +48,10 @@ public class EntryMapper
 
 			colid = c.getColumnIndex(EntryTable.UPDATED);
 			entry.setUpdated(c.getString(colid));
+			
+			colid = c.getColumnIndex(EntryTable.CATEGORY_ID);
+			entry.setCategoryId(c.getLong(colid));
+			
 			entries.add(entry);
 	     }
 	     
@@ -68,11 +59,17 @@ public class EntryMapper
 		
 		return entries;
 	}
-	
-	public long insert(Entry entry, long categoryId)
-	{
+
+	@Override
+	public Entry load(long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public long insert(Entry entry) {
 		ContentValues values = new ContentValues();
-		values.put(EntryTable.CATEGORY_ID, categoryId);
+		values.put(EntryTable.CATEGORY_ID, entry.getCategoryId());
 		values.put(EntryTable.TITLE, entry.getTitle());
 		values.put(EntryTable.LINK, entry.getLink());
 		values.put(EntryTable.DESCRIPTION, entry.getDescription());
@@ -80,22 +77,24 @@ public class EntryMapper
 		values.put(EntryTable.UPDATED, entry.getUpdated());
 		return wdb.insert(EntryTable.TABLE_NAME, EntryTable.ID, values);
 	}
-	
-	public long batchInsert(List<Entry> entries, long categoryId){
-		long id = -1;
+
+	@Override
+	public boolean insertAll(List<Entry> entries) {
+		
 		wdb.beginTransaction();
 		for(Entry entry : entries){
-			id = insert(entry, categoryId);
+			insert(entry);
 		}
 		wdb.setTransactionSuccessful();
 		wdb.endTransaction();
-		return id;
+		return true;
 	}
-	//private boolean update(Entry entry){
-	//	return false;
-	//}
+
+	@Override
+	public boolean exist(long id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
-	//private boolean remove(Entry entry){
-	//	return false;
-	//}
 }
+

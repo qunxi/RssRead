@@ -7,7 +7,7 @@
         android:title="@string/action_settings"/>
 	
     <item 
-	    android:id="@+id/action_labels"
+	    android:id="@+id/action_entries_refresh"
 	    android:icon="@drawable/ic_action_refresh"
 	    android:showAsAction="always"
 	    android:title=""/>
