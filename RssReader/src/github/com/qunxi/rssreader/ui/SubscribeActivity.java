@@ -6,6 +6,7 @@ import com.example.rssreader.R;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Context;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
@@ -29,6 +30,15 @@ public class SubscribeActivity extends Activity {
 	{
 		EditText editText = (EditText)findViewById(R.id.edit_subscribe);
 		String rssFeedAddr = editText.getText().toString();
-		new DownloadXmlAsyncTask(this).execute(rssFeedAddr);
+		new SubcribeAsyncTask(this).execute(rssFeedAddr);
+	}
+	
+	
+	private class SubcribeAsyncTask extends DownloadXmlAsyncTask{
+
+		public SubcribeAsyncTask(Context context) {
+			super(context);	
+		}
+		
 	}
 }

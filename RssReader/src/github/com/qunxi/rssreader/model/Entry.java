@@ -5,17 +5,20 @@ import java.util.regex.Pattern;
 
 import android.text.Html;
 
-public class Entry {
+public class Entry extends EntityObject {
 	
 	private static final int SUMMARY_END = 150;
 	private static final int SUMMARY_BEGIN = 0;
 	
+	private long id;
 	private String title;
 	private String link;
-	private String description;
+	private boolean unread;
+	private String summary;
 	private String content;
 	private String updated;
-	private long categoryId = -1;
+	private long feedId = -1;
+	
 	public Entry(){
 		
 	}
@@ -24,7 +27,7 @@ public class Entry {
 	{
 		this.title = title;
 		this.link = link;
-		this.description = description;
+		//this.description = description;
 		this.content = content;
 		this.updated = updated;
 	}
@@ -45,13 +48,13 @@ public class Entry {
 		this.link = link;
 	}
 	
-	public String getDescription(){
+	/*public String getDescription(){
 		return description;
 	}
 	
 	public void setDescription(String description){
 		this.description = description;
-	}
+	}*/
 	
 	public String getContent(){
 		return content;
@@ -61,7 +64,7 @@ public class Entry {
 		this.content = content;
 	}
 	
-	public String getSummary(){
+	/*public String getSummary(){
 		if(description != null){
 			return description;
 		}else{
@@ -71,7 +74,7 @@ public class Entry {
 			String summary = contents.substring(SUMMARY_BEGIN,  end);
 			return summary;
 		}
-	}
+	}*/
 	
 	public String getThumbImage(){
 		Pattern p=Pattern.compile("<img\\s+src\\s*=\\s*\"(\\w+)\">");
@@ -90,11 +93,49 @@ public class Entry {
 		this.updated = updated;
 	}
 
-	public long getCategoryId() {
-		return categoryId;
+	public long getFeedId() {
+		return feedId;
 	}
 
-	public void setCategoryId(long categoryId) {
-		this.categoryId = categoryId;
+	public void setFeedId(long categoryId) {
+		this.feedId = categoryId;
+	}
+
+	public boolean isUnread() {
+		return unread;
+	}
+
+	public void setUnread(boolean unread) {
+		this.unread = unread;
+	}
+
+	public String getSummary() {
+		return summary;
+	}
+
+	public void setSummary(String summary) {
+		this.summary = summary;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+	
+	public boolean equals(Entry entry){
+		if(this.content == entry.getContent() 
+		   && this.feedId == entry.getFeedId()
+		   && this.link == entry.getLink()
+		   && this.unread == entry.isUnread()
+		   && this.summary == entry.getSummary()
+		   && this.title == entry.getTitle()
+		   && this.updated == entry.getUpdated()){
+			return true;
+		}
+		else
+			return false;
 	}
 }

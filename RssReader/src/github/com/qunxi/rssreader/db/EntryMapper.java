@@ -1,100 +1,60 @@
 package github.com.qunxi.rssreader.db;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import github.com.qunxi.rssreader.model.EntityObject;
 import github.com.qunxi.rssreader.model.Entry;
 
-public class EntryMapper extends AbstractMapper<Entry>{
+public class EntryMapper extends AbstractMapper{
 
-	public EntryMapper(Context context) {
-		super(context);
+	public EntryMapper(Context context, String database, int version) {
+		super(context, database, version);
 	}
 
 	@Override
-	public List<Entry> loadAll(long id, int offset) {
-		List<Entry> entries = new ArrayList<Entry>();
-		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT * FROM ")
-		   .append(EntryTable.TABLE_NAME)
-		   .append(" WHERE ")
-		   .append(EntryTable.CATEGORY_ID)
-		   .append(" == ")
-		   .append(id)
-		   .append(" order by updated desc ")
-		   .append(" LIMIT ")
-		   .append(LIMIT)
-		   .append(" OFFSET ")
-		   .append(offset);
-		Cursor c = rdb.rawQuery(sql.toString(), null);
+	protected EntityObject doLoad(Cursor c) {
 		
-		while (c.moveToNext()) {
-			Entry entry = new Entry();
-			
-			int colid = c.getColumnIndex(EntryTable.LINK);
-			entry.setLink(c.getString(colid));
-			
-			colid = c.getColumnIndex(EntryTable.TITLE);
-			entry.setTitle(c.getString(colid));
-			
-			colid = c.getColumnIndex(EntryTable.DESCRIPTION);
-			entry.setDescription(c.getString(colid));
-			
-			colid = c.getColumnIndex(EntryTable.CONTENT);
-			entry.setContent(c.getString(colid));
-
-			colid = c.getColumnIndex(EntryTable.UPDATED);
-			entry.setUpdated(c.getString(colid));
-			
-			colid = c.getColumnIndex(EntryTable.CATEGORY_ID);
-			entry.setCategoryId(c.getLong(colid));
-			
-			entries.add(entry);
-	     }
-	     
-		c.close();
+		Entry entry = new Entry();
 		
-		return entries;
+		int colid = c.getColumnIndex(EntryTable.LINK);
+		entry.setLink(c.getString(colid));
+		
+		colid = c.getColumnIndex(EntryTable.TITLE);
+		entry.setTitle(c.getString(colid));
+		
+		colid = c.getColumnIndex(EntryTable.SUMMARY);
+		entry.setSummary(c.getString(colid));
+		
+		colid = c.getColumnIndex(EntryTable.CONTENT);
+		entry.setContent(c.getString(colid));
+
+		colid = c.getColumnIndex(EntryTable.UPDATED);
+		entry.setUpdated(c.getString(colid));
+		
+		colid = c.getColumnIndex(EntryTable.FEED_ID);
+		entry.setFeedId(c.getLong(colid));
+		
+		return entry;
 	}
 
 	@Override
-	public Entry load(long id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public long insert(Entry entry) {
+	protected long doInsert(EntityObject entity) {
+		Entry entry = (Entry)entity;
 		ContentValues values = new ContentValues();
-		values.put(EntryTable.CATEGORY_ID, entry.getCategoryId());
+		values.put(EntryTable.FEED_ID, entry.getFeedId());
 		values.put(EntryTable.TITLE, entry.getTitle());
 		values.put(EntryTable.LINK, entry.getLink());
-		values.put(EntryTable.DESCRIPTION, entry.getDescription());
+		values.put(EntryTable.SUMMARY, entry.getSummary());
 		values.put(EntryTable.CONTENT, entry.getContent());
 		values.put(EntryTable.UPDATED, entry.getUpdated());
-		return wdb.insert(EntryTable.TABLE_NAME, EntryTable.ID, values);
+		long id= wdb.insert(EntryTable.TABLE_NAME, EntryTable._ID, values);
+		entry.setId(id);
+		return id;
 	}
 
-	@Override
-	public boolean insertAll(List<Entry> entries) {
-		
-		wdb.beginTransaction();
-		for(Entry entry : entries){
-			insert(entry);
-		}
-		wdb.setTransactionSuccessful();
-		wdb.endTransaction();
-		return true;
-	}
-
-	@Override
-	public boolean exist(long id) {
-		// TODO Auto-generated method stub
+	/*protected boolean addAll(List<Entry> entries){
 		return false;
-	}
-	
+	}*/
 }
 

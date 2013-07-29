@@ -1,6 +1,5 @@
 package github.com.qunxi.rssreader.xmlparser;
 
-import github.com.qunxi.rssreader.model.Category;
 import github.com.qunxi.rssreader.model.Entry;
 import github.com.qunxi.rssreader.model.Feed;
 
@@ -22,9 +21,7 @@ public class RssFeedBuilder extends AbstractFeedParser
 		parser.nextTag();
 		parser.require(XmlPullParser.START_TAG, NameSpace, CHANNEL);
 		List<Entry> entries = new ArrayList<Entry>();
-		String headerTitle = null;
-		String feedUpdated = null;
-		String logo = null;
+		Feed feed = new Feed();
 		while(parser.next() != XmlPullParser.END_DOCUMENT){
 			if(parser.getEventType() != XmlPullParser.START_TAG){
 				continue;
@@ -40,11 +37,11 @@ public class RssFeedBuilder extends AbstractFeedParser
 				}
 			}
 			else if(name.equals(TitleTag)){ //feed title
-				headerTitle = getTitle();
+				feed.setTitle(getTitle());
 			}
 			else if(name.equals(LastBuildDate)){ //feed update date
-				feedUpdated = getLastBuilderDate();
-				if(feedUpdated.equals(fromDate)){
+				feed.setUpdated(getLastBuilderDate());
+				if(getLastBuilderDate().equals(fromDate)){
 					return null;
 				}
 			}
@@ -52,8 +49,8 @@ public class RssFeedBuilder extends AbstractFeedParser
 				ignoreNotInterestTag();
 			}
 		}
-		Category feedHeader = new Category(headerTitle, feedUpdated, entries.size(), logo);
-		return new Feed(feedHeader, entries);
+		feed.setEntries(entries);
+		return feed;
 	}
 	
 	@Override
@@ -70,9 +67,9 @@ public class RssFeedBuilder extends AbstractFeedParser
 			else if(name.equals(LinkTag)){
 				entry.setLink(getLink());
 			}
-			else if(name.equals(DescriptionTag)){
-				entry.setDescription(getDescription());
-			}
+			/*else if(name.equals(DescriptionTag)){
+				entry.setSummary(summary);(getDescription());
+			}*/
 			else if(name.equals(Content_Encode)){
 				entry.setContent(getContents());
 			}
@@ -89,9 +86,7 @@ public class RssFeedBuilder extends AbstractFeedParser
 	private String getPublishDate() throws XmlPullParserException, IOException{
 		return readText(Publish_Date);
 	}
-	private String getDescription() throws XmlPullParserException, IOException{
-		return readText(DescriptionTag);
-	}
+
 	private String getLastBuilderDate() throws XmlPullParserException, IOException{
 		return readText(LastBuildDate);
 	}
@@ -103,14 +98,5 @@ public class RssFeedBuilder extends AbstractFeedParser
 	private String getLink() throws XmlPullParserException, IOException
 	{
 		return readText(LinkTag);
-		/*String link = null;
-		parser.require(XmlPullParser.START_TAG, NameSpace, LinkTag);
-		if(parser.getName().equals(LinkTag))
-		{
-			link = parser.getAttributeValue(NameSpace, HrefAttribute);
-			parser.nextTag();
-		}
-		parser.require(XmlPullParser.END_TAG, NameSpace, LinkTag);
-		return link;*/
 	}
 }

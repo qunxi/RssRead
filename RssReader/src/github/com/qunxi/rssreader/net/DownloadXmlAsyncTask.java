@@ -7,9 +7,8 @@ import java.net.URL;
 
 import org.xmlpull.v1.XmlPullParserException;
 
-import github.com.qunxi.rssreader.db.CategoryMapper;
-import github.com.qunxi.rssreader.db.EntryMapper;
-import github.com.qunxi.rssreader.model.Category;
+import github.com.qunxi.rssreader.db.FeedMapper;
+import github.com.qunxi.rssreader.db.MapperRegister;
 import github.com.qunxi.rssreader.model.Feed;
 import github.com.qunxi.rssreader.xmlparser.FeedBuilderFactory;
 import github.com.qunxi.rssreader.xmlparser.IFeedBuilder;
@@ -83,24 +82,24 @@ public class DownloadXmlAsyncTask extends AsyncTask<String, Void, Feed> {
 	}
 	
 	private boolean saveFeedToDatabase(Feed feed){
-		CategoryMapper categoryMapper = new CategoryMapper(context);
-		Category category = feed.getCategory();
-		category.setUrl(url);
-		long id = category.getId();
 		
-		if(!categoryMapper.exist(id)){
-			id = categoryMapper.insert(category);
+		new MapperRegister(context);
+		FeedMapper feedMapper = MapperRegister.feed();
+		if(feed.getId() == -1){
+			try {
+				return feedMapper.saveFeed(feed);
+			} catch (Exception e) {
+				Log.d("feedMapper", "save feed error");
+				e.printStackTrace();
+			}
+		}else{
+			try {
+				return feedMapper.updateFeed(feed);
+			} catch (Exception e) {
+				Log.d("feedMapper", "update feed error");
+				e.printStackTrace();
+			}
 		}
-		else{
-			categoryMapper.updateDate(id, category.getUpdateTime());
-		}
-		
-		if(id != -1){
-			feed.setCategoryId(id);
-			EntryMapper entryMapper = new EntryMapper(context);
-			return entryMapper.insertAll(feed.getEntries());
-		}
-
 		return false;
 	 }
 

@@ -15,6 +15,12 @@ public abstract class AbstractFeedParser implements IFeedBuilder{
 		this.parser = parser;
 	}
 	
+	
+	protected String getPlainText(String tagName) throws XmlPullParserException, IOException{
+		parser.require(XmlPullParser.START_TAG, NameSpace, tagName);
+		return parser.getText();
+	}
+	
 	protected String readText(String tagName) throws XmlPullParserException, IOException
 	{
 		parser.require(XmlPullParser.START_TAG, NameSpace, tagName);

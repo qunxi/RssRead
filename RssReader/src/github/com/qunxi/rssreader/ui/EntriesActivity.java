@@ -7,7 +7,7 @@ import java.net.URL;
 
 import java.util.List;
 
-import github.com.qunxi.rssreader.db.EntryMapper;
+import github.com.qunxi.rssreader.db.MapperRegister;
 import github.com.qunxi.rssreader.model.Entry;
 import github.com.qunxi.rssreader.model.Feed;
 import github.com.qunxi.rssreader.net.DownloadXmlAsyncTask;
@@ -38,21 +38,16 @@ import android.widget.TextView;
 public class EntriesActivity extends ListActivity implements OnScrollListener {
 
 	private static final int LOAD_ITEMS = 10;
-	
-	private String categoryTitle;
-	private long categoryId;
-	
-	private int currentPosition = -10; //this number for the start position of select from database.
-	
+	private Feed feed = null;
 	boolean updated = false;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		categoryTitle = getIntent().getStringExtra("categoryTitle");
-		this.categoryId = getIntent().getLongExtra("categoryId", -1);
-		
-		EntryAdapter entryAdapter = new EntryAdapter(this, loadEntries(categoryId));
+		long feedId = getIntent().getLongExtra("feedId", -1);
+		feed = loadFeed(feedId);
+		EntryAdapter entryAdapter = new EntryAdapter(this, feed.getEntries());
 		setListAdapter(entryAdapter);
 		
 		getListView().setOnScrollListener(this);
@@ -68,11 +63,7 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
 		if(item.getItemId() == R.id.action_entries_refresh){
-			//Intent intent = new Intent(this, )
-			String url = getIntent().getStringExtra("url");
-			String fromDate = getIntent().getStringExtra("fromDate");
-			new UpdateAnsyncTask(this).execute(url, fromDate);
-			
+			new UpdateAnsyncTask(this).execute(feed.getUrl(), feed.getUpdated());
 		}
 		return true;
 	}
@@ -81,37 +72,26 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		
 		if(scrollState == OnScrollListener.SCROLL_STATE_IDLE && updated){
-			new ScrollLoadAsnycTask(this).execute();
-			/*EntryAdapter entryAdapter = (EntryAdapter)getListAdapter();
-			entryAdapter.addAll(loadEntries(categoryId));*/
+			new ScrollLoadAsnycTask().execute();
 		}
 	}
 	
 	
 	private class ScrollLoadAsnycTask extends AsyncTask<Void, Void, List<Entry>> {
-
-		private EntriesActivity context;
-		
-		public ScrollLoadAsnycTask(EntriesActivity context) {
-			this.context = context;
-		}
 		
 		@Override
 		protected List<Entry> doInBackground(Void... params) {
-			
-			return context.loadEntries(context.categoryId);
+			return loadFeed(feed.getId()).getEntries();
 		}
 		
 		@Override
 	    protected void onPostExecute(List<Entry> result) {
-			EntryAdapter adapter = (EntryAdapter)context.getListAdapter();
+			EntryAdapter adapter = (EntryAdapter)getListAdapter();
 			adapter.addAll(result);
 	    }
 		
 	}
-	
-	
-	
+		
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
 	{
@@ -129,14 +109,12 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 		intent.putExtra("content", content);
 		intent.putExtra("title", selectItem.getTitle());
 		intent.putExtra("updated", selectItem.getUpdated());
-		intent.putExtra("categoryTitle", categoryTitle);
+		intent.putExtra("categoryTitle", feed.getTitle());
 		startActivity(intent);
 	}
 	
-	private List<Entry> loadEntries(long categoryId){
-		EntryMapper entryMapper = new EntryMapper(this);
-		return entryMapper.loadAll(categoryId, currentPosition += LOAD_ITEMS);
-		//return entryMapper.loadEntries(currentPoistion += LOAD_ITEMS, categoryId);
+	private Feed loadFeed(long feedId){
+		return MapperRegister.feed().getFeedById(feedId);
 	}
 	
 	
@@ -145,15 +123,15 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 		private EntryAdapter adapter;
 		public UpdateAnsyncTask(Context context) {
 			super(context);
-			this.adapter = (EntryAdapter)((EntriesActivity)context).getListAdapter();
+			this.adapter = (EntryAdapter)getListAdapter();
 		}
 		
 		@Override
 		protected void onPostExecute(Feed result) {
 			if(result != null){
-				result.getCategory().setId(categoryId);
+				result.setId(feed.getId());
 				super.onPostExecute(result);
-				List<Entry> entries = loadEntries(((EntriesActivity)context).categoryId);
+				List<Entry> entries = loadFeed(feed.getId()).getEntries();
 				adapter.refresh(entries);
 			}
 	    }
@@ -220,8 +198,7 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 			
 			return view;
 		}
-		
-	
+			
 		private final class ViewHolder{
 			protected ImageView iconImage;
 			protected TextView updatedText;

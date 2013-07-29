@@ -6,38 +6,51 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper
 {
-	private final static String DATABASE_NAME = "rss.db";
-	private final static int DATABASE_VERSION = 1;
 	
-	private final static String CATEGORY_TABLE_SQL= "CREATE TABLE category (id INTEGER PRIMARY KEY, title TEXT, count INTEGER, updated TEXT, url TEXT)";
-	private final static String ENTRY_TABLE_SQL = "CREATE TABLE entry (id INTEGER PRIMARY KEY, categoryId INTEGER, title TEXT, link TEXT, description TEXT, content TEXT, updated TEXT)";
-	
+	private static final String[] tableClassName = new String[] {
+		"github.com.qunxi.rssreader.db.EntryTable",
+		"github.com.qunxi.rssreader.db.FeedTable"//add new table name to be here
+	};
 	
 	private static DatabaseHelper instance = null;
 	
-	public static DatabaseHelper instance(Context context){
+	public static DatabaseHelper instance(Context context, String database, int version){
 		if(instance == null){
-			instance = new DatabaseHelper(context);
+			instance = new DatabaseHelper(context, database, version);
 		}
 		return instance;
 	}
 	
-	private DatabaseHelper(Context context) {
-		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+	private DatabaseHelper(Context context, String database, int version) {
+		super(context, database, null, version);
 	}
 	
 	@Override  
-    public void onCreate(SQLiteDatabase db) {  
-		db.execSQL(CATEGORY_TABLE_SQL);
-		db.execSQL(ENTRY_TABLE_SQL);
+    public void onCreate(SQLiteDatabase db) {
+		try{
+			for(int i = 0; i < tableClassName.length; ++i){
+				Table table = (Table) Class.forName(tableClassName[i]).newInstance();
+				String sql = table.createTableSQL();
+				db.execSQL(sql);
+			}
+		}
+		catch(Exception e){
+			
+		}
 	}
 	
 	@Override  
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {  
-		db.execSQL("DROP TABLE IF EXISTS category");
-        db.execSQL("DROP TABLE IF EXISTS entry");
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		try{
+			for(int i = 0; i < tableClassName.length; ++i){
+				Table table = (Table) Class.forName(tableClassName[i]).newInstance();
+				String sql = table.dropTableSQL();
+				db.execSQL(sql);
+			}
+		}
+		catch(Exception e){
+			
+		}
         onCreate(db);
-	}
-	
-	//private String  
+	} 
 }

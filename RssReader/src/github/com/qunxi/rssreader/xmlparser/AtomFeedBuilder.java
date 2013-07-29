@@ -2,7 +2,6 @@ package github.com.qunxi.rssreader.xmlparser;
 
 import github.com.qunxi.rssreader.model.Entry;
 import github.com.qunxi.rssreader.model.Feed;
-import github.com.qunxi.rssreader.model.Category;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,11 +12,8 @@ import org.xmlpull.v1.XmlPullParserException;
 
 public class AtomFeedBuilder extends AbstractFeedParser 
 {
-	//private XmlPullParser parser;
-	
 	public AtomFeedBuilder(XmlPullParser parser){
 		super(parser);
-		//this.parser = parser;
 	}
 	
 
@@ -25,9 +21,10 @@ public class AtomFeedBuilder extends AbstractFeedParser
 	{
 		parser.require(XmlPullParser.START_TAG, NameSpace, FeedTag);
 		List<Entry> entries = new ArrayList<Entry>();
-		String headerTitle = null;
-		String feedUpdated = null;
-		String logo = null;
+		//String headerTitle = null;
+		//String feedUpdated = null;
+		//String logo = null;
+		Feed feed = new Feed();
 		while(parser.next() != XmlPullParser.END_DOCUMENT){
 			if(parser.getEventType() != XmlPullParser.START_TAG){
 				continue;
@@ -43,11 +40,11 @@ public class AtomFeedBuilder extends AbstractFeedParser
 				}
 			}
 			else if(name.equals(TitleTag)){ //feed title
-				headerTitle = getTitle();
+				feed.setTitle(getTitle());
 			}
 			else if(name.equals(UpdatedTag)){ //feed update date
-				feedUpdated = getUpdated();
-				if(feedUpdated.equals(fromDate)){
+				feed.setUpdated(getUpdated());
+				if(getUpdated().equals(fromDate)){
 					return null;
 				}
 			}
@@ -55,35 +52,11 @@ public class AtomFeedBuilder extends AbstractFeedParser
 				ignoreNotInterestTag();
 			}
 		}
-		Category feedHeader = new Category(headerTitle, feedUpdated, entries.size(), logo);
-		return new Feed(feedHeader, entries);
+		//Category feedHeader = new Category(headerTitle, feedUpdated, entries.size(), logo);
+		feed.setEntries(entries);
+		return feed;
 	}
 	
-	
-	/*public List<Entry> getUpdateEntries(String fromDate) throws XmlPullParserException, IOException{
-		
-		parser.require(XmlPullParser.START_TAG, NameSpace, FeedTag);
-		List<Entry> entries = new ArrayList<Entry>();
-		while(parser.next() != XmlPullParser.END_DOCUMENT){
-			if(parser.getEventType() != XmlPullParser.START_TAG){
-				continue;
-			}
-			String name = parser.getName();
-			if(name.equals(UpdatedTag) && getUpdated().equals(fromDate)){
-				return null;
-			}
-			else if(name.equals(EntryTag)){
-				Entry entry = generateEntry();
-				if(entry.getUpdated().equals(fromDate)){
-					break;
-				}
-				else{
-					entries.add(entry);
-				}
-			}
-		}
-		return entries;
-	}*/
 	@Override
 	protected Entry generateEntry() throws XmlPullParserException, IOException
 	{
@@ -98,13 +71,13 @@ public class AtomFeedBuilder extends AbstractFeedParser
 			}
 			String name = parser.getName();
 			if(name.equals(TitleTag)){
-				title = getTitle();
+				title = /*getPlainText(TitleTag);*/getTitle();
 			}
 			else if(name.equals(LinkTag)){
-				link = getLink();
+				link = /*getPlainText(LinkTag);*/getLink();
 			}
 			else if(name.equals(SummaryTag)){
-				description = getDescription();
+				description = /*getPlainText(SummaryTag);*/getDescription();
 			}
 			else if(name.equals(ContentTag)){
 				content = getContents();
