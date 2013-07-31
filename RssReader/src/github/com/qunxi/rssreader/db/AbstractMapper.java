@@ -11,8 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 public abstract class AbstractMapper{
 	
-	
-		
+	protected Context context;
 	protected DatabaseHelper dbHelper = null; 
 	protected SQLiteDatabase wdb = null;
 	protected SQLiteDatabase rdb = null;
@@ -21,6 +20,7 @@ public abstract class AbstractMapper{
 	
 	public AbstractMapper(Context context, String database, int version){
 		
+		this.context = context;
 		dbHelper = DatabaseHelper.instance(context, database, version);
 		
 		wdb = dbHelper.getWritableDatabase();
@@ -40,10 +40,10 @@ public abstract class AbstractMapper{
 	}
 	
 	/*protected boolean modify(EntityObject entity){
-		return false;
+		return ;
 		
-	}
-	protected boolean remove(EntityObject entity) {
+	}*/
+	/*protected boolean remove(EntityObject entity) {
 		return false;
 	}*/
 	

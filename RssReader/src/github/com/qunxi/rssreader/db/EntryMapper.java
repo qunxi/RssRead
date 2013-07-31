@@ -12,6 +12,19 @@ public class EntryMapper extends AbstractMapper{
 		super(context, database, version);
 	}
 
+	protected boolean updateReadState(EntityObject entity){
+		Entry entry = (Entry)entity;
+		ContentValues values = new ContentValues();
+		values.put(EntryTable.UNREAD, entry.isUnread());
+		String[] whereArgs ={Long.toString(entry.getId())};
+		if(wdb.update(EntryTable.TABLE_NAME, values, EntryTable._ID + " = ?", whereArgs) == 1){
+			wdb.close();
+			return true;
+		}
+		wdb.close();
+		return false;
+	}
+	
 	@Override
 	protected EntityObject doLoad(Cursor c) {
 		
@@ -19,6 +32,13 @@ public class EntryMapper extends AbstractMapper{
 		
 		int colid = c.getColumnIndex(EntryTable.LINK);
 		entry.setLink(c.getString(colid));
+		
+		colid = c.getColumnIndex(EntryTable._ID);
+		entry.setId(c.getLong(colid));
+		
+		colid = c.getColumnIndex(EntryTable.UNREAD);
+		boolean readState = c.getShort(colid) == 0 ? false : true;
+		entry.setUnread(readState);
 		
 		colid = c.getColumnIndex(EntryTable.TITLE);
 		entry.setTitle(c.getString(colid));
@@ -48,13 +68,11 @@ public class EntryMapper extends AbstractMapper{
 		values.put(EntryTable.SUMMARY, entry.getSummary());
 		values.put(EntryTable.CONTENT, entry.getContent());
 		values.put(EntryTable.UPDATED, entry.getUpdated());
+		values.put(EntryTable.UNREAD, entry.isUnread());
 		long id= wdb.insert(EntryTable.TABLE_NAME, EntryTable._ID, values);
 		entry.setId(id);
 		return id;
 	}
 
-	/*protected boolean addAll(List<Entry> entries){
-		return false;
-	}*/
 }
 

@@ -46,8 +46,10 @@ public class Feed extends EntityObject {
 	}
 	public void setId(long id) {
 		this.id = id;
-		for(Entry entry: entries){
-			entry.setFeedId(id);
+		if(entries != null){
+			for(Entry entry: entries){
+				entry.setFeedId(id);
+			}
 		}
 	}
 	public long getCounts() {

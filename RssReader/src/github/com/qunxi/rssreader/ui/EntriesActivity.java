@@ -1,9 +1,5 @@
 package github.com.qunxi.rssreader.ui;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 
 import java.util.List;
 
@@ -20,8 +16,6 @@ import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,7 +25,6 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -46,7 +39,7 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 		super.onCreate(savedInstanceState);
 		
 		long feedId = getIntent().getLongExtra("feedId", -1);
-		feed = loadFeed(feedId);
+		feed = loadFeed(feedId, 0);
 		EntryAdapter entryAdapter = new EntryAdapter(this, feed.getEntries());
 		setListAdapter(entryAdapter);
 		
@@ -81,7 +74,7 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 		
 		@Override
 		protected List<Entry> doInBackground(Void... params) {
-			return loadFeed(feed.getId()).getEntries();
+			return loadFeed(feed.getId(), -1).getEntries();
 		}
 		
 		@Override
@@ -111,10 +104,12 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 		intent.putExtra("updated", selectItem.getUpdated());
 		intent.putExtra("categoryTitle", feed.getTitle());
 		startActivity(intent);
+		selectItem.setUnread(false);
+		MapperRegister.feed(this).updateReadState(selectItem);
 	}
 	
-	private Feed loadFeed(long feedId){
-		return MapperRegister.feed().getFeedById(feedId);
+	private Feed loadFeed(long feedId, long offset){
+		return MapperRegister.feed(this).getFeedById(feedId, offset);
 	}
 	
 	
@@ -131,7 +126,7 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 			if(result != null){
 				result.setId(feed.getId());
 				super.onPostExecute(result);
-				List<Entry> entries = loadFeed(feed.getId()).getEntries();
+				List<Entry> entries = loadFeed(feed.getId(), 0).getEntries();
 				adapter.refresh(entries);
 			}
 	    }
@@ -166,7 +161,7 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 				container = new ViewHolder();
 				container.summaryText = (TextView)view.findViewById(R.id.entry_item_summary);
 				container.updatedText = (TextView)view.findViewById(R.id.entry_item_updated);
-				container.iconImage = (ImageView)view.findViewById(R.id.entry_item_icon);
+				//container.iconImage = (ImageView)view.findViewById(R.id.entry_item_icon);
 				
 				view.setTag(container);
 			}
@@ -174,33 +169,25 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 				view = convertView;
 				container = (ViewHolder)view.getTag();
 			}
-			
-			Bitmap bitmap = null;
-			try {
-				bitmap = BitmapFactory.decodeStream(new URL(entries.get(position).getThumbImage()).openConnection().getInputStream());
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			container.iconImage.setImageBitmap(bitmap);
-
+									
 		    container.updatedText.setText(entries.get(position).getUpdated());
 		    StringBuilder summary = new StringBuilder();
-		    summary.append("<font font-weight = \"bold\" color=\"#000000\"><strong>")
-		    	   .append(entries.get(position).getTitle())
+		    
+		    if(entries.get(position).isUnread())
+		    	summary.append("<font font-weight = \"bold\" color=\"#000000\"><strong>");
+		    else
+		    	summary.append("<font font-weight = \"bold\" color=\"#BEBEBE\"><strong>");
+		    summary.append(entries.get(position).getTitle())
 		    	   .append("-</strong></font>")
 		    	   .append(entries.get(position).getSummary());
-		    
+		   
 		    container.summaryText.setText(Html.fromHtml(summary.toString()));
 			
 			return view;
 		}
 			
 		private final class ViewHolder{
-			protected ImageView iconImage;
+			//protected ImageView iconImage;
 			protected TextView updatedText;
 			protected TextView summaryText;
 		}

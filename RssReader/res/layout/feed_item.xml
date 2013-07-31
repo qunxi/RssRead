@@ -9,7 +9,6 @@
 	        android:layout_height="35dip"
 	        android:layout_centerVertical="true"
         	android:layout_alignParentLeft="true"/>
-	       <!--  android:src="@drawable/ic_action_rss"/>-->
     <LinearLayout android:orientation="vertical"  
     	android:layout_width="wrap_content"  
    	 	android:layout_height="fill_parent"
@@ -21,6 +20,7 @@
 		    android:textIsSelectable="false"
 		    android:textStyle="bold"
 		    android:textSize="18sp"
+		    android:textColor="#000000"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
 		    android:paddingBottom="2dip"/>
@@ -39,7 +39,7 @@
 	    android:textStyle="bold"
 	    android:textColor="#778899"
 	    android:background="@drawable/radius_conrer"
-	    android:layout_width="45dip"
+	    android:layout_width="wrap_content"
 	    android:gravity="center_horizontal"
 	    android:layout_height="wrap_content"/>
 </RelativeLayout>

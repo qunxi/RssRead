@@ -7,13 +7,13 @@ import android.text.Html;
 
 public class Entry extends EntityObject {
 	
-	private static final int SUMMARY_END = 150;
+	private static final int SUMMARY_END = 50;
 	private static final int SUMMARY_BEGIN = 0;
 	
 	private long id;
 	private String title;
 	private String link;
-	private boolean unread;
+	private boolean unread = true;
 	private String summary;
 	private String content;
 	private String updated;
@@ -23,14 +23,14 @@ public class Entry extends EntityObject {
 		
 	}
 	
-	public Entry(String title, String link, String description, String content, String updated)
+	/*public Entry(String title, String link, String description, String content, String updated)
 	{
 		this.title = title;
 		this.link = link;
 		//this.description = description;
 		this.content = content;
 		this.updated = updated;
-	}
+	}*/
 	
 	public String getTitle(){
 		return title;
@@ -62,10 +62,15 @@ public class Entry extends EntityObject {
 	
 	public void setContent(String content){
 		this.content = content;
+		String contents = Html.fromHtml(content.replaceAll("<img.+?>", "")).toString();
+		int length = contents.length();
+		int end = length < SUMMARY_END ? length : SUMMARY_END; 
+		String summary = contents.substring(SUMMARY_BEGIN,  end);
+		setSummary(summary);
 	}
 	
 	/*public String getSummary(){
-		if(description != null){
+		/*if(description != null){
 			return description;
 		}else{
 			String contents = Html.fromHtml(content.replaceAll("<img.+?>", "")).toString();

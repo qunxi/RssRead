@@ -8,7 +8,7 @@
     	    android:layout_height="60dip"
     	    android:textIsSelectable="false"
     	    android:textStyle="bold"
-    	    android:textSize="20sp"
+    	    android:textSize="22sp"
     	    android:padding="5dip"
     	    android:gravity="bottom"/>
     	

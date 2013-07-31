@@ -12,6 +12,7 @@ public class EntryTable extends Table{
 	public static final String SUMMARY = "summary";	// this field just for display summary, not standard tag of rss or atom.
 	public static final String FEED_ID = "feed_id";
 	
+	
 	public EntryTable(){
 		columns.put(_ID, "INTEGER PRIMARY KEY");
 		columns.put(TITLE, "TEXT");

@@ -2,6 +2,7 @@ package github.com.qunxi.rssreader.xmlparser;
 
 import github.com.qunxi.rssreader.model.Entry;
 import github.com.qunxi.rssreader.model.Feed;
+import github.com.qunxi.rssreader.utils.DateNormalize;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,8 +41,9 @@ public class RssFeedBuilder extends AbstractFeedParser
 				feed.setTitle(getTitle());
 			}
 			else if(name.equals(LastBuildDate)){ //feed update date
-				feed.setUpdated(getLastBuilderDate());
-				if(getLastBuilderDate().equals(fromDate)){
+				String date = DateNormalize.RssDateConvert(getLastBuilderDate());
+				feed.setUpdated(date);
+				if(fromDate != null && date.equals(fromDate)){
 					return null;
 				}
 			}
@@ -67,20 +69,25 @@ public class RssFeedBuilder extends AbstractFeedParser
 			else if(name.equals(LinkTag)){
 				entry.setLink(getLink());
 			}
-			/*else if(name.equals(DescriptionTag)){
-				entry.setSummary(summary);(getDescription());
-			}*/
+			else if(name.equals(DescriptionTag)){
+				entry.setSummary(getDescription());
+			}
 			else if(name.equals(Content_Encode)){
 				entry.setContent(getContents());
 			}
 			else if(name.equals(Publish_Date)){
-				entry.setUpdated(getPublishDate());
+				String date = DateNormalize.RssDateConvert(getPublishDate());
+				entry.setUpdated(date);
 			}
 			else{
 				ignoreNotInterestTag();
 			}
 		}
 		return entry;
+	}
+	
+	private String getDescription() throws XmlPullParserException, IOException{
+		return readText(DescriptionTag);
 	}
 	
 	private String getPublishDate() throws XmlPullParserException, IOException{

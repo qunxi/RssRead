@@ -31,7 +31,10 @@ public class DownloadXmlAsyncTask extends AsyncTask<String, Void, Feed> {
 			try{
 				this.url = urls[0];
 				stream = DownloadFeedFile(url);
-				return getFeedFromXml(stream, urls.length == 1 ? null : urls[1]);
+				Feed feed = getFeedFromXml(stream, urls.length == 1 ? null : urls[1]);
+				if(feed != null)
+					feed.setUrl(url);
+				return feed;
 			}
 			finally{
 				if(stream != null){
@@ -52,11 +55,7 @@ public class DownloadXmlAsyncTask extends AsyncTask<String, Void, Feed> {
 		}
 		//show failed message
     }
-	
-	/*protected Context getContext(){
-		return context;
-	}*/
-	
+		
 	private InputStream DownloadFeedFile(String feedUrl) throws IOException{
 		URL url = new URL(feedUrl);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -83,8 +82,8 @@ public class DownloadXmlAsyncTask extends AsyncTask<String, Void, Feed> {
 	
 	private boolean saveFeedToDatabase(Feed feed){
 		
-		new MapperRegister(context);
-		FeedMapper feedMapper = MapperRegister.feed();
+		//new MapperRegister(context);
+		FeedMapper feedMapper = MapperRegister.feed(context);
 		if(feed.getId() == -1){
 			try {
 				return feedMapper.saveFeed(feed);

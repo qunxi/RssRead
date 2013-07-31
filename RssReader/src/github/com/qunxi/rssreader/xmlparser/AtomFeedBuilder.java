@@ -2,6 +2,7 @@ package github.com.qunxi.rssreader.xmlparser;
 
 import github.com.qunxi.rssreader.model.Entry;
 import github.com.qunxi.rssreader.model.Feed;
+import github.com.qunxi.rssreader.utils.DateNormalize;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,9 +22,7 @@ public class AtomFeedBuilder extends AbstractFeedParser
 	{
 		parser.require(XmlPullParser.START_TAG, NameSpace, FeedTag);
 		List<Entry> entries = new ArrayList<Entry>();
-		//String headerTitle = null;
-		//String feedUpdated = null;
-		//String logo = null;
+
 		Feed feed = new Feed();
 		while(parser.next() != XmlPullParser.END_DOCUMENT){
 			if(parser.getEventType() != XmlPullParser.START_TAG){
@@ -43,8 +42,9 @@ public class AtomFeedBuilder extends AbstractFeedParser
 				feed.setTitle(getTitle());
 			}
 			else if(name.equals(UpdatedTag)){ //feed update date
-				feed.setUpdated(getUpdated());
-				if(getUpdated().equals(fromDate)){
+				String date = DateNormalize.AtomDateConvert(getUpdated());
+				feed.setUpdated(date);
+				if(fromDate != null && date.equals(fromDate)){
 					return null;
 				}
 			}
@@ -52,7 +52,7 @@ public class AtomFeedBuilder extends AbstractFeedParser
 				ignoreNotInterestTag();
 			}
 		}
-		//Category feedHeader = new Category(headerTitle, feedUpdated, entries.size(), logo);
+		
 		feed.setEntries(entries);
 		return feed;
 	}
@@ -60,45 +60,38 @@ public class AtomFeedBuilder extends AbstractFeedParser
 	@Override
 	protected Entry generateEntry() throws XmlPullParserException, IOException
 	{
-		String title = null;
-		String link = null;
-		String description = null;
-		String content = null;
-		String updated = null;
+		Entry entry = new Entry();
 		while(parser.next() != XmlPullParser.END_TAG){
 			if(parser.getEventType() != XmlPullParser.START_TAG){
 				continue;
 			}
 			String name = parser.getName();
 			if(name.equals(TitleTag)){
-				title = /*getPlainText(TitleTag);*/getTitle();
+				entry.setTitle(getTitle());
 			}
 			else if(name.equals(LinkTag)){
-				link = /*getPlainText(LinkTag);*/getLink();
-			}
-			else if(name.equals(SummaryTag)){
-				description = /*getPlainText(SummaryTag);*/getDescription();
+				entry.setLink(getLink());
 			}
 			else if(name.equals(ContentTag)){
-				content = getContents();
+				entry.setContent(getContents());
 			}
 			else if(name.equals(UpdatedTag)){
-				updated = getUpdated();
+				entry.setUpdated(DateNormalize.AtomDateConvert(getUpdated()));
 			}
 			else{
 				ignoreNotInterestTag();
 			}
 		}
-		return new Entry(title, link, description, content, updated);
+		return entry;
 	}
 
 	protected String getUpdated() throws XmlPullParserException, IOException{
 		return readText(UpdatedTag);
 	}
 
-	private String getDescription() throws XmlPullParserException, IOException {
+	/*private String getDescription() throws XmlPullParserException, IOException {
 		return readText(SummaryTag);
-	}
+	}*/
 	
 	protected String getContents() throws XmlPullParserException, IOException {
 		return readText(ContentTag);

@@ -28,6 +28,7 @@ public class MainActivity extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 	}
 
 	@Override
@@ -78,7 +79,8 @@ public class MainActivity extends ListActivity {
 	
 	private List<Feed> getFeeds(int curPos)
 	{
-		return MapperRegister.feed().getLimitFeeds(10, curPos);
+		//new MapperRegister(this);
+		return MapperRegister.feed(this).getLimitFeeds(10, curPos);
 	}
 	///
 	
@@ -90,7 +92,7 @@ public class MainActivity extends ListActivity {
 		
 		public FeedsAdapter(Activity context, List<Feed> objects) 
 		{
-			super(context, R.layout.category_item, objects);
+			super(context, R.layout.feed_item, objects);
 			this.context = context;
 			this.feeds = objects;
 		}
@@ -106,7 +108,7 @@ public class MainActivity extends ListActivity {
 			
 			if(convertView == null){
 				LayoutInflater inflater = context.getLayoutInflater();
-				view = inflater.inflate(R.layout.category_item, null);
+				view = inflater.inflate(R.layout.feed_item, null);
 				
 				container.iconImage = (ImageView)view.findViewById(R.id.category_item_icon);
 				container.titleText = (TextView)view.findViewById(R.id.category_item_title);

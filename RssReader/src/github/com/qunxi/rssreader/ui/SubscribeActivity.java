@@ -1,5 +1,9 @@
 package github.com.qunxi.rssreader.ui;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import github.com.qunxi.rssreader.db.MapperRegister;
 import github.com.qunxi.rssreader.net.DownloadXmlAsyncTask;
 
 import com.example.rssreader.R;
@@ -29,8 +33,14 @@ public class SubscribeActivity extends Activity {
 	public void searchRssFeedAddr(View view)
 	{
 		EditText editText = (EditText)findViewById(R.id.edit_subscribe);
-		String rssFeedAddr = editText.getText().toString();
-		new SubcribeAsyncTask(this).execute(rssFeedAddr);
+		String url = editText.getText().toString();
+		Pattern p=Pattern.compile("^http(s)*://*");
+		Matcher m=p.matcher(url);
+		if(!m.find())
+			url = "http://" + url;
+		if(!MapperRegister.feed(this).isExist(url)){
+			new SubcribeAsyncTask(this).execute(url);
+		}
 	}
 	
 	
