@@ -19,6 +19,7 @@ public class FeedMapper extends AbstractMapper
 		super(context, database, version);
 	}
 	
+	//this method just query the feed table, not include associate entries.
 	@SuppressWarnings("unchecked")
 	public List<Feed> getLimitFeeds(int limit, int offset){
 		//"Select count(entry.unread) As totleItems, sum(entry.unread) As nureadItems, * from feed join entry on feed.id = entry.feedId group by feed.id"
@@ -56,7 +57,7 @@ public class FeedMapper extends AbstractMapper
 			OFFSET = offset;
 		}
    		String sql = "SELECT * FROM " + EntryTable.TABLE_NAME + " WHERE " + EntryTable.FEED_ID + "=" + feedId
-   				+ " LIMIT " + LIMIT + " OFFSET " + OFFSET;
+   				+ " ORDER BY " + EntryTable.UPDATED + " DESC " + " LIMIT " + LIMIT + " OFFSET " + OFFSET;
    		List<? extends EntityObject> entries = MapperRegister.entry(context).load(wdb.rawQuery(sql, null));
    		OFFSET += LIMIT;
    		wdb.close();
@@ -77,7 +78,7 @@ public class FeedMapper extends AbstractMapper
 		values.put(FeedTable.UPDATE_DATE, feed.getUpdated());
 		String[] whereArgs={Long.toString(feed.getId())};
 		wdb.beginTransaction();
-		if(wdb.update(FeedTable.TABLE_NAME, values, FeedTable._COUNT + "=?", whereArgs) == 1){
+		if(wdb.update(FeedTable.TABLE_NAME, values, FeedTable._ID + "=?", whereArgs) == 1){
 			if(MapperRegister.entry(context).addAll(feed.getEntries())){
 				wdb.setTransactionSuccessful();
 				wdb.endTransaction();

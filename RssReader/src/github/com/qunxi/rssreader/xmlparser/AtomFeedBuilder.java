@@ -2,7 +2,7 @@ package github.com.qunxi.rssreader.xmlparser;
 
 import github.com.qunxi.rssreader.model.Entry;
 import github.com.qunxi.rssreader.model.Feed;
-import github.com.qunxi.rssreader.utils.DateNormalize;
+import github.com.qunxi.rssreader.utils.DateUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,7 +31,9 @@ public class AtomFeedBuilder extends AbstractFeedParser
 			String name = parser.getName();
 			if(name.equals(EntryTag)){	// get all entries of feed
 				Entry entry = generateEntry();
-				if(fromDate !=null && entry.getUpdated().equals(fromDate)){
+				if(feed.getUpdated() == null || DateUtils.isLarge(entry.getUpdated(), feed.getUpdated()))
+					feed.setUpdated(entry.getUpdated());
+				if(fromDate !=null && DateUtils.isLarge(fromDate, entry.getUpdated())){
 					break;
 				}
 				else{
@@ -42,18 +44,17 @@ public class AtomFeedBuilder extends AbstractFeedParser
 				feed.setTitle(getTitle());
 			}
 			else if(name.equals(UpdatedTag)){ //feed update date
-				String date = DateNormalize.AtomDateConvert(getUpdated());
+				String date = DateUtils.AtomDateConvert(getUpdated());
 				feed.setUpdated(date);
-				if(fromDate != null && date.equals(fromDate)){
-					return null;
-				}
 			}
 			else{
 				ignoreNotInterestTag();
 			}
 		}
-		
-		feed.setEntries(entries);
+		if(entries.size() > 0)
+			feed.setEntries(entries);
+		else
+			feed = null;
 		return feed;
 	}
 	
@@ -78,7 +79,7 @@ public class AtomFeedBuilder extends AbstractFeedParser
 				entry.setContent(getContents());
 			}
 			else if(name.equals(UpdatedTag)){
-				entry.setUpdated(DateNormalize.AtomDateConvert(getUpdated()));
+				entry.setUpdated(DateUtils.AtomDateConvert(getUpdated()));
 			}
 			else{
 				ignoreNotInterestTag();

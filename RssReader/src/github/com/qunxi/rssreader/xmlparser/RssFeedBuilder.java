@@ -2,7 +2,7 @@ package github.com.qunxi.rssreader.xmlparser;
 
 import github.com.qunxi.rssreader.model.Entry;
 import github.com.qunxi.rssreader.model.Feed;
-import github.com.qunxi.rssreader.utils.DateNormalize;
+import github.com.qunxi.rssreader.utils.DateUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,7 +30,9 @@ public class RssFeedBuilder extends AbstractFeedParser
 			String name = parser.getName();
 			if(name.equals(ItemTag)){	// get all entries of feed
 				Entry entry = generateEntry();
-				if(fromDate !=null && entry.getUpdated().equals(fromDate)){
+				if(feed.getUpdated() == null || DateUtils.isLarge(entry.getUpdated(), feed.getUpdated()))
+					feed.setUpdated(entry.getUpdated());
+				if(fromDate !=null && DateUtils.isLarge(fromDate, entry.getUpdated())){
 					break;
 				}
 				else{
@@ -41,17 +43,17 @@ public class RssFeedBuilder extends AbstractFeedParser
 				feed.setTitle(getTitle());
 			}
 			else if(name.equals(LastBuildDate)){ //feed update date
-				String date = DateNormalize.RssDateConvert(getLastBuilderDate());
+				String date = DateUtils.RssDateConvert(getLastBuilderDate());
 				feed.setUpdated(date);
-				if(fromDate != null && date.equals(fromDate)){
-					return null;
-				}
 			}
 			else{
 				ignoreNotInterestTag();
 			}
 		}
-		feed.setEntries(entries);
+		if(entries.size() > 0)
+			feed.setEntries(entries);
+		else
+			feed = null;
 		return feed;
 	}
 	
@@ -76,7 +78,7 @@ public class RssFeedBuilder extends AbstractFeedParser
 				entry.setContent(getContents());
 			}
 			else if(name.equals(Publish_Date)){
-				String date = DateNormalize.RssDateConvert(getPublishDate());
+				String date = DateUtils.RssDateConvert(getPublishDate());
 				entry.setUpdated(date);
 			}
 			else{

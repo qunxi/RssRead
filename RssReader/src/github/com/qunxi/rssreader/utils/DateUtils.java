@@ -1,7 +1,9 @@
 package github.com.qunxi.rssreader.utils;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -10,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class DateNormalize {
+public class DateUtils {
 	
 	//EEE
 	/*public static final String DATE_ATOM = "Atom  Atom ( 2005-08-15T15:52:01+00:00)";
@@ -77,4 +79,18 @@ public class DateNormalize {
 		return fromDate;
 	}
 
+	@SuppressLint("SimpleDateFormat")
+	public static boolean isLarge(String src, String target){
+		DateFormat df = new SimpleDateFormat(FINAL_SAVE_FORMAT);
+	    try {
+	    	Date dSrc = df.parse(src);
+			Date dTarget = df.parse(target);
+			return dSrc.compareTo(dTarget) > 0 ? true : false;
+			
+		} catch (ParseException e) {
+			Log.e("DateUtils", "parse is error");
+			e.printStackTrace();
+			return src.compareTo(target) > 0 ? true : false;
+		}
+	}
 }
