@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">RssReader</string>
     <string name="action_settings">Settings</string>
     <string name="menu_about">about</string>
@@ -8,9 +7,6 @@
     <string name="menu_theme">theme</string>
     <string name="menu_language">language</string>
     <string name="subscribe_search">Search</string>
-    <string name="subscribe_search_hint">Enter Keywords or website</string>
-    <string name="title_activity_entries">Entries</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="title_activity_details">Details</string>
-
+    <string name="subscribe_search_hint">RSS address</string>
+    <string name="search_progress_info">Searching...</string>
 </resources>

@@ -2,16 +2,14 @@ package github.com.qunxi.rssreader.ui;
 
 
 import java.util.List;
-
 import github.com.qunxi.rssreader.db.MapperRegister;
 import github.com.qunxi.rssreader.model.Entry;
 import github.com.qunxi.rssreader.model.Feed;
 import github.com.qunxi.rssreader.net.DownloadXmlAsyncTask;
-
 import com.example.rssreader.R;
-
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Context;
@@ -42,7 +40,8 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 		feed = loadFeed(feedId, 0);
 		EntryAdapter entryAdapter = new EntryAdapter(this, feed.getEntries());
 		setListAdapter(entryAdapter);
-		
+		ActionBar bar = getActionBar(); 
+		bar.setTitle(feed.getTitle());
 		getListView().setOnScrollListener(this);
 	}
 

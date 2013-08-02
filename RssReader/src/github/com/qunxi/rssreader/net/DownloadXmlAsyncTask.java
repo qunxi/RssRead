@@ -59,8 +59,8 @@ public class DownloadXmlAsyncTask extends AsyncTask<String, Void, Feed> {
 	private InputStream DownloadFeedFile(String feedUrl) throws IOException{
 		URL url = new URL(feedUrl);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		conn.setReadTimeout(1000);
-		conn.setConnectTimeout(1500);
+		//conn.setReadTimeout(1000);
+		//conn.setConnectTimeout(1500);
 		conn.connect();
 		int response = conn.getResponseCode();
 		Log.d("HttpExample", "the response is:" + response);

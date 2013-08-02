@@ -33,7 +33,5 @@ public interface IFeedBuilder
 	
 	public abstract Feed getFeed(String fromDate) 
 					throws XmlPullParserException, IOException;
-	
-	
-		
+			
 }

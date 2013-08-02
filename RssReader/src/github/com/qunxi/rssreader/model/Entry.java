@@ -62,11 +62,12 @@ public class Entry extends EntityObject {
 	
 	public void setContent(String content){
 		this.content = content;
-		String contents = Html.fromHtml(content.replaceAll("<img.+?>", "")).toString();
-		int length = contents.length();
-		int end = length < SUMMARY_END ? length : SUMMARY_END; 
-		String summary = contents.substring(SUMMARY_BEGIN,  end);
-		setSummary(summary);
+		
+		if(summary == null){
+			String shortSummary = Html.fromHtml(content.replaceAll("<.+?>", "")).toString();
+			this.summary = shortSummary.substring(SUMMARY_BEGIN,  shortSummary.length() < SUMMARY_END ? shortSummary.length() -1 : SUMMARY_END );
+		}
+
 	}
 	
 	/*public String getSummary(){
@@ -119,7 +120,17 @@ public class Entry extends EntityObject {
 	}
 
 	public void setSummary(String summary) {
-		this.summary = summary;
+		if(summary != null && summary.length() > 200){
+			if(this.content == null){
+				this.content = summary; //assign the content by summary first, then if has content tag overwrite
+			}
+			String shortSummary = Html.fromHtml(summary.replaceAll("<.+?>", "")).toString();
+			this.summary = shortSummary.substring(SUMMARY_BEGIN,  shortSummary.length() < SUMMARY_END ? shortSummary.length() -1 : SUMMARY_END );
+			
+		}
+		else{
+			this.summary = summary;
+		}
 	}
 
 	public long getId() {

@@ -58,8 +58,7 @@ public class AtomFeedBuilder extends AbstractFeedParser
 	}
 	
 	@Override
-	protected Entry generateEntry() throws XmlPullParserException, IOException
-	{
+	protected Entry generateEntry() throws XmlPullParserException, IOException{
 		Entry entry = new Entry();
 		while(parser.next() != XmlPullParser.END_TAG){
 			if(parser.getEventType() != XmlPullParser.START_TAG){
@@ -72,6 +71,9 @@ public class AtomFeedBuilder extends AbstractFeedParser
 			else if(name.equals(LinkTag)){
 				entry.setLink(getLink());
 			}
+			else if(name.equals(SummaryTag)){
+				entry.setSummary(readText(SummaryTag));
+			}
 			else if(name.equals(ContentTag)){
 				entry.setContent(getContents());
 			}
@@ -81,6 +83,9 @@ public class AtomFeedBuilder extends AbstractFeedParser
 			else{
 				ignoreNotInterestTag();
 			}
+		}
+		if(entry.getContent() == null){
+			throw new IOException();
 		}
 		return entry;
 	}

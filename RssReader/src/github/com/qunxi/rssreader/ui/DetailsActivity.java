@@ -31,7 +31,6 @@ public class DetailsActivity extends Activity {
 		WebSettings webSettings= view.getSettings(); 
 		webSettings.setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
 		
-
 		view.loadDataWithBaseURL (null, content, "text/html", "utf-8",null);
 	}
 

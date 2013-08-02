@@ -83,6 +83,9 @@ public class RssFeedBuilder extends AbstractFeedParser
 				ignoreNotInterestTag();
 			}
 		}
+		if(entry.getContent() == null){
+			entry.setContent(entry.getSummary());
+		}
 		return entry;
 	}
 	

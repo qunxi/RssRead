@@ -17,7 +17,6 @@
 	    <menu>
 	        <item android:title="@string/menu_about"/>
 	        <item android:title="@string/menu_theme"/>
-	        <item android:title="@string/menu_language"/>
 	    </menu>
 	</item>
 </menu>

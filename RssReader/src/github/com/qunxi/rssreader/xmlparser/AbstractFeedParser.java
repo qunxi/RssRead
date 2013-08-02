@@ -86,7 +86,5 @@ public abstract class AbstractFeedParser implements IFeedBuilder{
 		return readText(TitleTag);
 	}
 	
-	
-	
 	protected abstract Entry generateEntry() throws XmlPullParserException, IOException;
 }

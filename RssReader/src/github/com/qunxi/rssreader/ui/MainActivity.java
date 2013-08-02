@@ -1,7 +1,6 @@
 package github.com.qunxi.rssreader.ui;
 
 import java.util.List;
-
 import github.com.qunxi.rssreader.db.MapperRegister;
 import github.com.qunxi.rssreader.model.Feed;
 
@@ -35,13 +34,8 @@ public class MainActivity extends ListActivity {
 	protected void onListItemClick (ListView l, View v, int position, long id)
 	{
 		Feed selectItem = (Feed)getListAdapter().getItem(position);
-		//long categoryId = selectItem.getId();
 		Intent intent = new Intent(this, EntriesActivity.class);
 		intent.putExtra("feedId", selectItem.getId());
-		//intent.putExtra("url", selectItem.getUrl());
-		//intent.putExtra("fromDate", selectItem.getUpdated());
-		//intent.putExtra("categoryId", categoryId);
-		//intent.putExtra("categoryTitle", selectItem.getTitle());
 		startActivity(intent);
 	}
 	
@@ -59,6 +53,7 @@ public class MainActivity extends ListActivity {
 			Intent intent = new Intent(this, SubscribeActivity.class);
 			startActivity(intent);
 		}
+
 		return true;
 	}
 	
@@ -69,17 +64,11 @@ public class MainActivity extends ListActivity {
 		List<Feed> categories = getFeeds(0);
 		FeedsAdapter feedAdapter = new FeedsAdapter(this, categories);
 		setListAdapter(feedAdapter);
-		
-		/*FeedsAdapter adapter = (FeedsAdapter)getListAdapter();
-		List<Category> categories  = getCategories(0);
-		if(categories != null && categories.size() > 0)
-			adapter.refresh(categories);*/
 	}
 	
 	
 	private List<Feed> getFeeds(int curPos)
 	{
-		//new MapperRegister(this);
 		return MapperRegister.feed(this).getLimitFeeds(10, curPos);
 	}
 	///
@@ -96,11 +85,6 @@ public class MainActivity extends ListActivity {
 			this.context = context;
 			this.feeds = objects;
 		}
-
-		/*public void refresh(List<Category> categories){
-			this.categories = categories;
-			notifyDataSetChanged();
-		}*/
 		
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {

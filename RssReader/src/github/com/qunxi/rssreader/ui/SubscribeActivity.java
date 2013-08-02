@@ -4,12 +4,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import github.com.qunxi.rssreader.db.MapperRegister;
+import github.com.qunxi.rssreader.model.Feed;
 import github.com.qunxi.rssreader.net.DownloadXmlAsyncTask;
 
 import com.example.rssreader.R;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.view.Menu;
 import android.view.View;
@@ -17,6 +19,7 @@ import android.widget.EditText;
 
 public class SubscribeActivity extends Activity {
 
+	private ProgressDialog progressDlg;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -36,9 +39,14 @@ public class SubscribeActivity extends Activity {
 		String url = editText.getText().toString();
 		Pattern p=Pattern.compile("^http(s)*://*");
 		Matcher m=p.matcher(url);
-		if(!m.find())
+		if(!m.find()){
 			url = "http://" + url;
+		}
+		
 		if(!MapperRegister.feed(this).isExist(url)){
+			progressDlg = new ProgressDialog(this);
+			progressDlg.setMessage(getText(R.string.search_progress_info));
+			progressDlg.show();
 			new SubcribeAsyncTask(this).execute(url);
 		}
 	}
@@ -50,5 +58,10 @@ public class SubscribeActivity extends Activity {
 			super(context);	
 		}
 		
+		@Override
+	    protected void onPostExecute(Feed result) {
+			super.onPostExecute(result);
+			progressDlg.dismiss();
+		}
 	}
 }
