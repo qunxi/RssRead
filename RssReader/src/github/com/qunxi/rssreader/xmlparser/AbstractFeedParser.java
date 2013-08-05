@@ -1,8 +1,12 @@
 package github.com.qunxi.rssreader.xmlparser;
 
 import github.com.qunxi.rssreader.model.Entry;
+import github.com.qunxi.rssreader.model.Feed;
+import github.com.qunxi.rssreader.utils.DateUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -11,16 +15,93 @@ public abstract class AbstractFeedParser implements IFeedBuilder{
 	
 	protected XmlPullParser parser;
 	
+	protected String LatestUpdateDateTag = null;
+	protected String EntryTag = null;
+	protected String DescriptionTag = null;
+	protected String EntryUpdateDateTag = null;
+	protected String ContentTag = null; 
+	
+	protected String TitleTag = "title";
+	protected String LinkTag = "link";
+	
 	public AbstractFeedParser(XmlPullParser parser){
 		this.parser = parser;
+		initializeTag();
 	}
 	
-	
-	protected String getPlainText(String tagName) throws XmlPullParserException, IOException{
-		parser.require(XmlPullParser.START_TAG, NameSpace, tagName);
-		return parser.getText();
+	@Override
+	public Feed getFeed(String fromDate) throws XmlPullParserException, IOException {
+		parser.nextTag();
+		List<Entry> entries = new ArrayList<Entry>();
+		Feed feed = new Feed();
+		while(parser.next() != XmlPullParser.END_DOCUMENT){
+			if(parser.getEventType() != XmlPullParser.START_TAG){
+				continue;
+			}
+			String name = parser.getName();
+			if(name.equals(EntryTag)){	// get all entries of feed
+				Entry entry = generateEntry();
+				if(feed.getUpdated() == null || DateUtils.isLargeEqual(entry.getUpdated(), feed.getUpdated()))
+					feed.setUpdated(entry.getUpdated());
+				if(fromDate !=null 
+				   && DateUtils.isLargeEqual(fromDate, entry.getUpdated())){
+					break;
+				}
+				else{
+					entries.add(entry);
+				}
+			}
+			else if(name.equals(TitleTag)){ //feed title
+				feed.setTitle(readText(TitleTag));
+			}
+			else if(name.equals(LatestUpdateDateTag)){ //feed update date
+				String date = normalizeDate(readText(LatestUpdateDateTag));
+				feed.setUpdated(date);
+			}
+			else{
+				ignoreNotInterestTag();
+			}
+		}
+		if(entries.size() > 0)
+			feed.setEntries(entries);
+		else
+			feed = null;
+		return feed;
 	}
 	
+	private  Entry generateEntry() throws XmlPullParserException, IOException{
+		Entry entry = new Entry();
+		while(parser.next() != XmlPullParser.END_TAG){
+			if(parser.getEventType() != XmlPullParser.START_TAG){
+				continue;
+			}
+			String name = parser.getName();
+			if(name.equals(TitleTag)){
+				entry.setTitle(readText(TitleTag));
+			}
+			else if(name.equals(LinkTag)){
+				entry.setLink(getLink());
+			}
+			else if(name.equals(DescriptionTag)){
+				entry.setSummary(readText(DescriptionTag));
+			}
+			else if(name.equals(ContentTag)){
+				entry.setContent(readText(ContentTag));
+			}
+			else if(name.equals(EntryUpdateDateTag)){
+				String date = normalizeDate(readText(EntryUpdateDateTag));
+				entry.setUpdated(date);
+			}
+			else{
+				ignoreNotInterestTag();
+			}
+		}
+		if(entry.getContent() == null){
+			entry.setContent(entry.getSummary());
+		}
+		return entry;
+	}
+		
 	protected String readText(String tagName) throws XmlPullParserException, IOException
 	{
 		parser.require(XmlPullParser.START_TAG, NameSpace, tagName);
@@ -29,7 +110,7 @@ public abstract class AbstractFeedParser implements IFeedBuilder{
 		return text;
 	}
 
-	protected String getInnerAllValuesOfTag(String tagName) 
+	private String getInnerAllValuesOfTag(String tagName) 
 									throws XmlPullParserException, IOException
 	{
 		StringBuilder strBuilder = new StringBuilder();
@@ -62,7 +143,7 @@ public abstract class AbstractFeedParser implements IFeedBuilder{
 		return strBuilder.toString();
 	}
 	
-	protected void ignoreNotInterestTag()
+	private void ignoreNotInterestTag()
 							   throws XmlPullParserException, IOException
 	{
 		if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -81,10 +162,7 @@ public abstract class AbstractFeedParser implements IFeedBuilder{
 	    }
 	}
 	
-	
-	protected String getTitle() throws XmlPullParserException, IOException {
-		return readText(TitleTag);
-	}
-	
-	protected abstract Entry generateEntry() throws XmlPullParserException, IOException;
+	protected abstract String getLink() throws XmlPullParserException, IOException;
+	protected abstract void initializeTag();
+	protected abstract String normalizeDate(String srcDate);
 }

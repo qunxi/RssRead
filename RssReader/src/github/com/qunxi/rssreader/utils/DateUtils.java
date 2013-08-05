@@ -80,17 +80,17 @@ public class DateUtils {
 	}
 
 	@SuppressLint("SimpleDateFormat")
-	public static boolean isLarge(String src, String target){
+	public static boolean isLargeEqual(String src, String target){
 		DateFormat df = new SimpleDateFormat(FINAL_SAVE_FORMAT);
 	    try {
 	    	Date dSrc = df.parse(src);
 			Date dTarget = df.parse(target);
-			return dSrc.compareTo(dTarget) > 0 ? true : false;
+			return dSrc.compareTo(dTarget) >= 0 ? true : false;
 			
 		} catch (ParseException e) {
 			Log.e("DateUtils", "parse is error");
 			e.printStackTrace();
-			return src.compareTo(target) > 0 ? true : false;
+			return src.compareTo(target) >= 0 ? true : false;
 		}
 	}
 }
