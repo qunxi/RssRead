@@ -1,3 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
+	<item 
+	    android:id="@+id/action_recycle"
+	    android:icon="@drawable/ic_action_recycle"
+	    android:showAsAction="always"
+	    android:title=""/>
 </menu>

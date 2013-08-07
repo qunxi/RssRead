@@ -2,11 +2,14 @@ package github.com.qunxi.rssreader.ui;
 
 
 import java.util.List;
+
 import github.com.qunxi.rssreader.db.MapperRegister;
 import github.com.qunxi.rssreader.model.Entry;
 import github.com.qunxi.rssreader.model.Feed;
 import github.com.qunxi.rssreader.net.DownloadXmlAsyncTask;
+
 import com.example.rssreader.R;
+
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.ActionBar;
@@ -60,6 +63,12 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 		return true;
 	}
 	
+	@Override
+	protected void onResume(){
+		super.onResume();
+		((EntryAdapter) getListAdapter()).notifyDataSetChanged();
+	}
+	
 	@Override  
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		
@@ -105,6 +114,7 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 		startActivity(intent);
 		selectItem.setUnread(false);
 		MapperRegister.feed(this).updateReadState(selectItem);
+	
 	}
 	
 	private Feed loadFeed(long feedId, long offset){

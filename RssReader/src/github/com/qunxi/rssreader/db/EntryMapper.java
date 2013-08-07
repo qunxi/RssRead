@@ -1,5 +1,7 @@
 package github.com.qunxi.rssreader.db;
 
+import java.util.List;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -12,6 +14,19 @@ public class EntryMapper extends AbstractMapper{
 		super(context, database, version);
 	}
 
+	public void removeEntries(long feedId, List<Long> entrieIds)
+	{
+		wdb.beginTransaction();
+		for(long id: entrieIds){
+			
+			String sql = "DELETE FROM " + EntryTable.TABLE_NAME + " WHERE " + EntryTable.FEED_ID + " = " + feedId + " AND " + EntryTable._ID + " = " + id;
+			wdb.execSQL(sql);
+		}
+		wdb.setTransactionSuccessful();
+		wdb.endTransaction();
+		wdb.close();
+	}
+	
 	protected boolean updateReadState(EntityObject entity){
 		Entry entry = (Entry)entity;
 		ContentValues values = new ContentValues();

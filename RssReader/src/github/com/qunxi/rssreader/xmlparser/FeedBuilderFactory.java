@@ -34,7 +34,7 @@ public class FeedBuilderFactory
 			return new AtomFeedBuilder(parser);
 		}
 		else if(tagName.equals(IFeedBuilder.RssTag)){
-			//String version = parser.getAttributeValue(IFeedBuilder.NameSpace, IFeedBuilder.VersionAttr);
+			parser.nextTag(); //ignore the "channel" tag
 			return new RssFeedBuilder(parser);
 		}
 		else{

@@ -9,4 +9,8 @@
     <string name="subscribe_search">Search</string>
     <string name="subscribe_search_hint">RSS address</string>
     <string name="search_progress_info">Searching...</string>
+    <string name="multimode_action_title"> items selected</string>
+    <string name="remove_dialog_title">Do you want to remove the items</string>
+    <string name="yes_button_text">Yes</string>
+    <string name="no_button_text">No</string>
 </resources>

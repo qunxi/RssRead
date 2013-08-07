@@ -9,4 +9,8 @@
     <string name="subscribe_search">搜索</string>
     <string name="subscribe_search_hint">RSS 地址</string>
     <string name="search_progress_info">搜索...</string>
+    <string name="multimode_action_title"> 条记录被选中</string>
+    <string name="remove_dialog_title">是否确定删除所选记录</string>
+    <string name="yes_button_text">确定</string>
+    <string name="no_button_text">取消</string>
 </resources>

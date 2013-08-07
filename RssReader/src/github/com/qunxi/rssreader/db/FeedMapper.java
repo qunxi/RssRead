@@ -96,6 +96,19 @@ public class FeedMapper extends AbstractMapper
 		}
 	}
 	
+	public void removeFeed(List<Long> feedIds){
+		wdb.beginTransaction();
+		for(long id : feedIds){
+			String sql = "DELETE FROM " + FeedTable.TABLE_NAME + " WHERE " + FeedTable._ID + " = " + id;
+			wdb.execSQL(sql);
+			String sqlentry = "DELETE FROM " + EntryTable.TABLE_NAME + " WHERE " + EntryTable.FEED_ID + " = " + id;
+			wdb.execSQL(sqlentry);
+		}
+		wdb.setTransactionSuccessful();
+		wdb.endTransaction();
+		wdb.close();
+	}
+	
 	public boolean isExist(String url){
 		String sql = "SELECT COUNT(*) FROM " + FeedTable.TABLE_NAME + " WHERE " + FeedTable.URL + " = '" + url + "'";
 		Cursor c = wdb.rawQuery(sql, null);

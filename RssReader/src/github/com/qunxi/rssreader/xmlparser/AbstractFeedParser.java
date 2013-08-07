@@ -31,7 +31,7 @@ public abstract class AbstractFeedParser implements IFeedBuilder{
 	
 	@Override
 	public Feed getFeed(String fromDate) throws XmlPullParserException, IOException {
-		parser.nextTag();
+		//parser.nextTag();
 		List<Entry> entries = new ArrayList<Entry>();
 		Feed feed = new Feed();
 		while(parser.next() != XmlPullParser.END_DOCUMENT){
