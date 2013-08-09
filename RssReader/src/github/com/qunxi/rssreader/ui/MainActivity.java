@@ -10,11 +10,8 @@ import com.example.rssreader.R;
 
 import android.os.Bundle;
 import android.app.Activity;
-import android.app.AlertDialog.Builder;
-import android.app.Dialog;
+
 import android.app.ListActivity;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,13 +19,10 @@ import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -48,7 +42,7 @@ public class MainActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		ListView listView = getListView();
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-		listView.setMultiChoiceModeListener(new ModeCallBack());
+		listView.setMultiChoiceModeListener(new ModeCallBack(this));
 	}
 
 	@Override
@@ -93,70 +87,33 @@ public class MainActivity extends ListActivity {
 	}
 	///
 	
-	private class ModeCallBack implements MultiChoiceModeListener{
+	private class ModeCallBack extends MultiChoiceDeleteMode{
 
-		@Override
-		public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
-			switch(item.getItemId())
-			{
-				case R.id.action_recycle:
-					Dialog dlg = new Builder(MainActivity.this)
-					.setIcon(R.drawable.ic_alerts_warning)
-					.setTitle(R.string.remove_dialog_title)
-					.setPositiveButton(R.string.yes_button_text, new OnClickListener(){
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							MapperRegister.feed(MainActivity.this).removeFeed(getSelectedFeedIds());
-							((BaseAdapter)getListAdapter()).notifyDataSetChanged();
-							mode.finish();
-						}
-					})
-					.setNegativeButton(R.string.no_button_text,  new OnClickListener(){
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-						}
-					}).create();
-					dlg.show();
-					
-				default:
-			}
-		
-			return true;
+		public ModeCallBack(ListActivity activity) {
+			super(activity);
 		}
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.details, menu);
 			isChoiceMode = true;
-			((BaseAdapter)getListAdapter()).notifyDataSetChanged();
-			return true;
+			return super.onCreateActionMode(mode, menu);
 		}
-
+		
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
 			isChoiceMode = false;
 			itemsState.clear();
 		}
-
-		@Override
-		public boolean onPrepareActionMode(ActionMode arg0, Menu arg1) {
-			
-			return true;
-		}
-
+		
 		@Override
 		public void onItemCheckedStateChanged(ActionMode mode, int position,
 				long id, boolean checked) {
-			 final int checkedCount = getListView().getCheckedItemCount();
 			 itemsState.put(position, checked);
-			 if(checkedCount > 0){
-				 mode.setTitle("" + checkedCount + getText(R.string.multimode_action_title));
-			 }
+			 super.onItemCheckedStateChanged(mode, position, id, checked);
 		}
-		
-		private List<Long> getSelectedFeedIds(){
+
+		@Override
+		public void doPositiveButton() {
 			List<Long> feedIds = new ArrayList<Long>();
 			for(int i = 0; i < itemsState.size(); ++i){
 				int position = itemsState.keyAt(i);
@@ -167,12 +124,10 @@ public class MainActivity extends ListActivity {
 				
 				feedIds.add(id);
 			}
-			return feedIds;
+			MapperRegister.feed(MainActivity.this).removeFeed(feedIds);	
 		}
 	}
-	
-	
-	
+		
 	private class FeedsAdapter extends ArrayAdapter<Feed>{
 		private final Activity context;
 		private List<Feed> feeds;

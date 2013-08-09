@@ -14,10 +14,10 @@ public class EntryMapper extends AbstractMapper{
 		super(context, database, version);
 	}
 
-	public void removeEntries(long feedId, List<Long> entrieIds)
+	public void removeEntries(long feedId, List<Long> entryIds)
 	{
 		wdb.beginTransaction();
-		for(long id: entrieIds){
+		for(long id: entryIds){
 			
 			String sql = "DELETE FROM " + EntryTable.TABLE_NAME + " WHERE " + EntryTable.FEED_ID + " = " + feedId + " AND " + EntryTable._ID + " = " + id;
 			wdb.execSQL(sql);

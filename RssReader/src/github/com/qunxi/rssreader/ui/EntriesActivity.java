@@ -1,6 +1,6 @@
 package github.com.qunxi.rssreader.ui;
 
-
+import java.util.ArrayList;
 import java.util.List;
 
 import github.com.qunxi.rssreader.db.MapperRegister;
@@ -18,6 +18,8 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.text.Html;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -33,19 +36,24 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 
 	private static final int LOAD_ITEMS = 10;
 	private Feed feed = null;
-	boolean updated = false;
+	private boolean updated = false;
+	
+	private boolean isChoiceMode = false;
+	private SparseBooleanArray itemsState = new SparseBooleanArray();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		ListView listView = getListView();
 		long feedId = getIntent().getLongExtra("feedId", -1);
 		feed = loadFeed(feedId, 0);
 		EntryAdapter entryAdapter = new EntryAdapter(this, feed.getEntries());
 		setListAdapter(entryAdapter);
 		ActionBar bar = getActionBar(); 
 		bar.setTitle(feed.getTitle());
-		getListView().setOnScrollListener(this);
+		listView.setOnScrollListener(this);
+		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+		listView.setMultiChoiceModeListener(new ModeCallBack(this));
 	}
 
 	@Override
@@ -120,7 +128,49 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 	private Feed loadFeed(long feedId, long offset){
 		return MapperRegister.feed(this).getFeedById(feedId, offset);
 	}
+		
 	
+	private class ModeCallBack extends MultiChoiceDeleteMode{
+
+		public ModeCallBack(ListActivity activity) {
+			super(activity);
+		}
+
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			isChoiceMode = true;
+			return super.onCreateActionMode(mode, menu);
+		}
+		
+		@Override
+		public void onDestroyActionMode(ActionMode arg0) {
+			isChoiceMode = false;
+			itemsState.clear();
+		}
+		
+		@Override
+		public void onItemCheckedStateChanged(ActionMode mode, int position,
+				long id, boolean checked) {
+			 itemsState.put(position, checked);
+			 super.onItemCheckedStateChanged(mode, position, id, checked);
+		}
+
+		@Override
+		public void doPositiveButton() {
+			List<Long> entryIds = new ArrayList<Long>();
+			for(int i = 0; i < itemsState.size(); ++i){
+				int position = itemsState.keyAt(i);
+				Entry entry = ((Entry)getListAdapter().getItem(position));
+				long id = entry.getId();
+				EntryAdapter adapter = (EntryAdapter)getListAdapter();
+				adapter.remove(entry);
+				
+				entryIds.add(id);
+			}
+			MapperRegister.entry(context).removeEntries(feed.getId(), entryIds);
+		}
+		
+	}
 	
 	private class UpdateAnsyncTask extends DownloadXmlAsyncTask{
 
@@ -171,7 +221,7 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 				container.summaryText = (TextView)view.findViewById(R.id.entry_item_summary);
 				container.updatedText = (TextView)view.findViewById(R.id.entry_item_updated);
 				//container.iconImage = (ImageView)view.findViewById(R.id.entry_item_icon);
-				
+				container.selCheckbox = (CheckBox)view.findViewById(R.id.entry_item_selected);
 				view.setTag(container);
 			}
 			else{
@@ -192,6 +242,14 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 		   
 		    container.summaryText.setText(Html.fromHtml(summary.toString()));
 			
+		    if(isChoiceMode){
+				container.selCheckbox.setVisibility(View.VISIBLE);
+				
+				container.selCheckbox.setChecked(itemsState.get(position));
+			}else{
+				container.selCheckbox.setVisibility(View.GONE);
+			}
+		    
 			return view;
 		}
 			
@@ -199,6 +257,7 @@ public class EntriesActivity extends ListActivity implements OnScrollListener {
 			//protected ImageView iconImage;
 			protected TextView updatedText;
 			protected TextView summaryText;
+			protected CheckBox selCheckbox;
 		}
 		
 	}
